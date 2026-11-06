@@ -12,3 +12,9 @@ export interface Innings {
 }
 export interface MatchResult { status: string; message: string; detail: string }
 export interface ScoreData { innings: Innings[]; result: MatchResult }
+
+export interface Token {
+  type: 'KEYWORD' | 'IDENTIFIER' | 'STRING' | 'NUMBER' | 'SYMBOL' | 'EOF';
+  lexeme: string; line: number; column: number; end_column?: number;
+}
+export interface LexicalOutput { tokens: Token[] }

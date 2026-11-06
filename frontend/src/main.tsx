@@ -1,11 +1,12 @@
 import { StrictMode, useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { PHASE_NAMES, type PhaseEvent, type ScoreData } from './types';
+import { PHASE_NAMES, type PhaseEvent, type ScoreData, type Token, type LexicalOutput } from './types';
 import { readEvents, sourceRange } from './api';
 import { useBackendConnection } from './BackendConnection';
 import { PhaseOverview } from './PhaseOverview';
 import { ErrorDetails } from './ErrorDetails';
 import { Scorecard } from './Scorecard';
+import { TokenOutput } from './TokenOutput';
 import './styles.css';
 
 const emptyPhases = (): PhaseEvent[] => PHASE_NAMES.map((name, phase) => ({ phase, name, status: 'pending' }));
@@ -31,7 +32,8 @@ function App() {
       await readEvents(response, event => {
         if (active.current !== controller) return;
         setPhases(previous => previous.map((phase, index) => index === event.phase ? event : phase));
-        if (event.status === 'failed' || event.status === 'unavailable') setSelected(event.phase);
+        if (event.status === 'failed') setSelected(event.phase);
+        if (event.status === 'unavailable') setSelected(Math.max(0, event.phase - 1));
         if (event.phase === 5 && event.status === 'completed') {
           const output = event.output as { scorecard: ScoreData };
           setScore(output.scorecard);
@@ -48,11 +50,13 @@ function App() {
     }
   };
   const phase = phases[selected];
-  const locate = () => {
-    if (!phase.error || !editor.current) return;
-    const [start, end] = sourceRange(source, phase.error.line, phase.error.column, phase.error.end_column);
+  const locatePosition = (position: { line: number; column: number; end_column?: number }) => {
+    if (!editor.current) return;
+    const [start, end] = sourceRange(source, position.line, position.column, position.end_column);
     editor.current.focus(); editor.current.setSelectionRange(start, end);
   };
+  const locate = () => { if (phase.error) locatePosition(phase.error); };
+  const locateToken = (token: Token) => locatePosition(token);
   return <>
     <header><a className="brand" href="/">HOWZAT<span>Cricket scoring compiler</span></a><button className="connection" onClick={() => void refresh()}>{message} ↻</button></header>
     <div className="intro"><h1>From cricket code to a scorecard.</h1><p>Write code → Compile → Explore each phase</p></div>
@@ -71,7 +75,7 @@ function App() {
         <PhaseOverview phases={phases} selected={selected} onSelect={setSelected}/>
         {requestError && <p className="error" role="alert">{requestError}</p>}
         <section className="phase-detail" aria-live="polite"><div className="section-heading"><h2>{selected + 1}. {phase.name}</h2><span>{phase.status}{phase.duration_ms !== undefined ? ` · ${phase.duration_ms} ms` : ''}</span></div>
-          {phase.error ? <ErrorDetails error={phase.error} onLocate={locate}/> : phase.output !== undefined ? <pre>{JSON.stringify(phase.output, null, 2)}</pre> : <p>{phase.message || (phase.status === 'running' ? 'Processing…' : phase.status === 'skipped' ? 'An earlier phase did not finish.' : 'Compile your code to inspect this phase.')}</p>}
+          {phase.error ? <ErrorDetails error={phase.error} onLocate={locate}/> : phase.output !== undefined ? selected === 0 ? <TokenOutput tokens={(phase.output as LexicalOutput).tokens} onLocate={locateToken}/> : <pre>{JSON.stringify(phase.output, null, 2)}</pre> : <p>{phase.message || (phase.status === 'running' ? 'Processing…' : phase.status === 'skipped' ? 'An earlier phase did not finish.' : 'Compile your code to inspect this phase.')}</p>}
           <div className="phase-navigation"><button disabled={selected === 0} onClick={() => setSelected(selected - 1)}>← Previous</button><button disabled={selected === 5} onClick={() => setSelected(selected + 1)}>Next phase →</button></div>
         </section>
       </section>
