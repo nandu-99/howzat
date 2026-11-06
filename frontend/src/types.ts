@@ -36,3 +36,11 @@ export interface InningsNode extends SourcePosition { type: 'Innings'; team: str
 export interface TeamNode extends SourcePosition { type: 'Team'; id: string; name: string; name_location: SourcePosition }
 export interface Program { type: 'Program'; teams: TeamNode[]; innings: InningsNode[] }
 export interface SyntaxOutput { ast: Program; parse_tree: ParseTree }
+
+export interface TeamSymbol extends SourcePosition { kind: 'team'; name: string }
+export interface DeliveryCheck extends SourcePosition {
+  team: string; over: number; delivery: number; kind: Delivery['kind']; value: number; status: 'valid';
+}
+export interface SemanticOutput {
+  symbol_table: Record<string, TeamSymbol>; checks: DeliveryCheck[]; validated_ast: Program;
+}
