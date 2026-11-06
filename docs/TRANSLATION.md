@@ -51,7 +51,6 @@ not a sandbox for arbitrary Python; only compiler-generated programs belong here
 The intermediate view shows the formatted instructions and count. The target
 view shows generated Python; the existing scorecard displays executed results.
 
-The driver preserves its strict six-phase order. A missing optimizer is reported
-as unavailable and stops the stream. Translation tests use an explicitly labeled
-test-only identity adapter to exercise real code generation and execution without
-introducing an optimizer substitute into the application.
+The driver preserves its strict six-phase order. Optimization substitutes
+constants before target generation; the target runtime also supports arithmetic
+instructions directly. See [optimization](OPTIMIZATION.md) for the transformation.

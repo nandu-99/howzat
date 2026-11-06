@@ -79,7 +79,9 @@ class PipelineTests(unittest.TestCase):
             self.assertEqual(events[4]["status"], "running")
             self.assertEqual(events[5]["status"], "completed")
             self.assertIn("IND", events[5]["output"]["symbol_table"])
-            self.assertEqual(events[6]["status"], "unavailable")
+            self.assertEqual([event["phase"] for event in events if event["status"] == "completed"], list(range(6)))
+            self.assertIn("EMIT_DELIVERY", events[7]["output"]["code"])
+            self.assertEqual(events[-1]["output"]["scorecard"]["innings"][0]["runs"], 13)
             self.assertEqual(client.post("/api/compile", json={"source": ""}).status_code, 422)
             self.assertEqual(client.post("/api/compile", json={"source": "a" * 50001}).status_code, 422)
 

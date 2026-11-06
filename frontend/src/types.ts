@@ -54,3 +54,8 @@ export type Instruction =
   | { op: 'END_INNINGS' };
 export interface IntermediateOutput { instructions: Instruction[]; code: string }
 export interface TargetOutput { code: string; scorecard: ScoreData }
+
+export interface OptimizationOutput {
+  before: string; after: string; changes: string[];
+  before_count: number; after_count: number; instructions: Instruction[];
+}

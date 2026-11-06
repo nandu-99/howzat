@@ -1,6 +1,6 @@
 import { StrictMode, useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { PHASE_NAMES, type PhaseEvent, type ScoreData, type Token, type LexicalOutput, type SyntaxOutput as SyntaxData, type SemanticOutput as SemanticData, type IntermediateOutput as IntermediateData, type TargetOutput as TargetData } from './types';
+import { PHASE_NAMES, type PhaseEvent, type ScoreData, type Token, type LexicalOutput, type SyntaxOutput as SyntaxData, type SemanticOutput as SemanticData, type IntermediateOutput as IntermediateData, type TargetOutput as TargetData, type OptimizationOutput as OptimizationData } from './types';
 import { readEvents, sourceRange } from './api';
 import { useBackendConnection } from './BackendConnection';
 import { PhaseOverview } from './PhaseOverview';
@@ -11,6 +11,7 @@ import { SyntaxOutput } from './SyntaxOutput';
 import { SemanticOutput } from './SemanticOutput';
 import { IntermediateOutput } from './IntermediateOutput';
 import { TargetOutput } from './TargetOutput';
+import { OptimizationOutput } from './OptimizationOutput';
 import './styles.css';
 
 const emptyPhases = (): PhaseEvent[] => PHASE_NAMES.map((name, phase) => ({ phase, name, status: 'pending' }));
@@ -79,7 +80,7 @@ function App() {
         <PhaseOverview phases={phases} selected={selected} onSelect={setSelected}/>
         {requestError && <p className="error" role="alert">{requestError}</p>}
         <section className="phase-detail" aria-live="polite"><div className="section-heading"><h2>{selected + 1}. {phase.name}</h2><span>{phase.status}{phase.duration_ms !== undefined ? ` · ${phase.duration_ms} ms` : ''}</span></div>
-          {phase.error ? <ErrorDetails error={phase.error} onLocate={locate}/> : phase.output !== undefined ? selected === 0 ? <TokenOutput tokens={(phase.output as LexicalOutput).tokens} onLocate={locateToken}/> : selected === 1 ? <SyntaxOutput output={phase.output as SyntaxData}/> : selected === 2 ? <SemanticOutput output={phase.output as SemanticData} onLocate={locatePosition}/> : selected === 3 ? <IntermediateOutput output={phase.output as IntermediateData}/> : selected === 5 ? <TargetOutput output={phase.output as TargetData}/> : <pre>{JSON.stringify(phase.output, null, 2)}</pre> : <p>{phase.message || (phase.status === 'running' ? 'Processing…' : phase.status === 'skipped' ? 'An earlier phase did not finish.' : 'Compile your code to inspect this phase.')}</p>}
+          {phase.error ? <ErrorDetails error={phase.error} onLocate={locate}/> : phase.output !== undefined ? selected === 0 ? <TokenOutput tokens={(phase.output as LexicalOutput).tokens} onLocate={locateToken}/> : selected === 1 ? <SyntaxOutput output={phase.output as SyntaxData}/> : selected === 2 ? <SemanticOutput output={phase.output as SemanticData} onLocate={locatePosition}/> : selected === 3 ? <IntermediateOutput output={phase.output as IntermediateData}/> : selected === 4 ? <OptimizationOutput output={phase.output as OptimizationData}/> : selected === 5 ? <TargetOutput output={phase.output as TargetData}/> : <pre>{JSON.stringify(phase.output, null, 2)}</pre> : <p>{phase.message || (phase.status === 'running' ? 'Processing…' : phase.status === 'skipped' ? 'An earlier phase did not finish.' : 'Compile your code to inspect this phase.')}</p>}
           <div className="phase-navigation"><button disabled={selected === 0} onClick={() => setSelected(selected - 1)}>← Previous</button><button disabled={selected === 5} onClick={() => setSelected(selected + 1)}>Next phase →</button></div>
         </section>
       </section>
