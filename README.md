@@ -48,6 +48,16 @@ npm --prefix frontend run build
 The build emits `frontend/dist`. Restart the backend after building to serve the
 built application from port 8000 as well. During development use port 5173.
 
+## Playground and guide
+
+The playground starts with a one-over example. Its selector contains five correct
+programs and three errors covering lexical, syntax, and semantic analysis. Each
+example explains its expected result; error examples include corrected code.
+
+Open `/language` for tokens and regex, cricket rules, the CFG, and examples with
+ASTs, parse trees, derivations, and token paths. Try in playground loads the chosen
+source. Navigation preserves the current editor and compiler output.
+
 ## Language
 
 See [the language definition](docs/LANGUAGE.md) for keywords, token patterns,

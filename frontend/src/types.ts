@@ -72,3 +72,13 @@ export interface InningsCheck extends SourcePosition {
 }
 
 export type ParseTreeNode = ParseTree;
+
+export interface Example {
+  id: string; name: string; source: string; description: string; expected: string;
+  group: 'Correct examples' | 'Errors'; failure_phase?: number; fix?: string; fixed_source?: string;
+}
+export interface LanguageReference {
+  grammar: string; rules: { title: string; text: string }[]; keywords: string[];
+  tokens: {type: string; pattern: string; ignored: boolean}[];
+  samples: (Example & SyntaxOutput & { derivation: string[] })[];
+}
