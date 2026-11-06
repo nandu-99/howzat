@@ -48,6 +48,12 @@ npm --prefix frontend run build
 The build emits `frontend/dist`. Restart the backend after building to serve the
 built application from port 8000 as well. During development use port 5173.
 
+## Language
+
+See [the language definition](docs/LANGUAGE.md) for keywords, token patterns,
+and source conventions. Select a token value in the lexical output to locate it
+in the editor.
+
 ## Architecture
 
 Read [the compiler contracts](docs/CONTRACTS.md) for module interfaces and data formats.

@@ -69,7 +69,11 @@ class PipelineTests(unittest.TestCase):
             response = client.post("/api/compile", json={"source": "test"})
             self.assertEqual(response.status_code, 200)
             self.assertIn("application/x-ndjson", response.headers["content-type"])
-            self.assertEqual(json.loads(response.text.splitlines()[0])["status"], "unavailable")
+            events = [json.loads(line) for line in response.text.splitlines()]
+            self.assertEqual(events[0]["status"], "running")
+            self.assertEqual(events[1]["status"], "completed")
+            self.assertEqual(events[1]["output"]["tokens"][0]["lexeme"], "test")
+            self.assertEqual(events[2]["status"], "unavailable")
             self.assertEqual(client.post("/api/compile", json={"source": ""}).status_code, 422)
             self.assertEqual(client.post("/api/compile", json={"source": "a" * 50001}).status_code, 422)
 
