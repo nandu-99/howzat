@@ -44,3 +44,13 @@ export interface DeliveryCheck extends SourcePosition {
 export interface SemanticOutput {
   symbol_table: Record<string, TeamSymbol>; checks: DeliveryCheck[]; validated_ast: Program;
 }
+
+export type Operand = number | string;
+export type Instruction =
+  | { op: 'INNINGS'; team: string; complete: boolean }
+  | { op: 'OVER'; number: number; partial: boolean }
+  | { op: 'ADD' | 'MUL'; target: string; left: Operand; right: Operand }
+  | ({ op: 'DELIVERY'; kind: Delivery['kind']; value: Operand } & SourcePosition)
+  | { op: 'END_INNINGS' };
+export interface IntermediateOutput { instructions: Instruction[]; code: string }
+export interface TargetOutput { code: string; scorecard: ScoreData }

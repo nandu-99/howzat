@@ -46,6 +46,11 @@ Use `error_at(message, node)` when AST nodes contain source positions. The drive
 adds the phase ID and stops all subsequent phases. Unexpected exceptions are
 logged on the backend, with a generic diagnostic sent to the UI.
 
+## Translation
+
+See [intermediate and target code](TRANSLATION.md) for instruction operands,
+source metadata, runtime behavior, and generated output.
+
 ## Generated Python output
 
 The target generator produces Python only from validated compiler data. The driver
