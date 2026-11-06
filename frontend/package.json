@@ -10,7 +10,9 @@
     "preview": "vite preview --host 127.0.0.1"
   },
   "dependencies": {
+    "@xyflow/react": "^12.12.1",
     "react": "^19.0.0",
+    "react-d3-tree": "^3.6.7",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
