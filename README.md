@@ -63,6 +63,9 @@ validation, delivery values, and semantic diagnostics.
 See [intermediate and target code](docs/TRANSLATION.md) for IR instructions,
 Python generation, and scoring runtime behavior.
 
+See [constant optimization](docs/OPTIMIZATION.md) for folding, propagation,
+and the before/after comparison.
+
 ## Architecture
 
 Read [the compiler contracts](docs/CONTRACTS.md) for module interfaces and data formats.

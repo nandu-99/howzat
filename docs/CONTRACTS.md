@@ -46,6 +46,11 @@ Use `error_at(message, node)` when AST nodes contain source positions. The drive
 adds the phase ID and stops all subsequent phases. Unexpected exceptions are
 logged on the backend, with a generic diagnostic sent to the UI.
 
+## Optimization
+
+`optimize` returns new instructions and a list of change descriptions. An empty
+list means no transformations were needed. See [optimization](OPTIMIZATION.md).
+
 ## Translation
 
 See [intermediate and target code](TRANSLATION.md) for instruction operands,
