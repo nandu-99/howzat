@@ -29,6 +29,7 @@ AST root: `{type: "Program", teams: [...], innings: [...]}`.
 Each team has `{type: "Team", id, name, line, column}`. The target generator and
 result integration require the root `teams` field. Node shapes must remain
 consistent across parsing, semantic analysis, and IR generation.
+See [the grammar and AST contract](GRAMMAR.md) for complete node fields.
 
 Concrete tree nodes use `{symbol: string, children: TreeNode[]}`.
 Leaf token nodes may add `lexeme`. Phase output can be inspected as JSON.

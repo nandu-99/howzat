@@ -18,3 +18,21 @@ export interface Token {
   lexeme: string; line: number; column: number; end_column?: number;
 }
 export interface LexicalOutput { tokens: Token[] }
+
+export interface SourcePosition { line: number; column: number; end_column: number }
+export interface ParseTree {
+  symbol: string; children: ParseTree[];
+  lexeme?: string; token_type?: Token['type'];
+  line?: number; column?: number; end_column?: number;
+}
+export type Expression =
+  | ({ type: 'Constant'; value: number } & SourcePosition)
+  | ({ type: 'Binary'; op: '+' | '*'; left: Expression; right: Expression } & SourcePosition);
+export interface Delivery extends SourcePosition {
+  type: 'Delivery'; kind: 'run' | 'wide' | 'noball' | 'wicket' | 'bye' | 'legbye'; value: Expression;
+}
+export interface Over extends SourcePosition { type: 'Over'; number: number; partial: boolean; deliveries: Delivery[] }
+export interface InningsNode extends SourcePosition { type: 'Innings'; team: string; complete: boolean; overs: Over[] }
+export interface TeamNode extends SourcePosition { type: 'Team'; id: string; name: string; name_location: SourcePosition }
+export interface Program { type: 'Program'; teams: TeamNode[]; innings: InningsNode[] }
+export interface SyntaxOutput { ast: Program; parse_tree: ParseTree }
