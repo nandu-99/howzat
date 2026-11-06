@@ -58,7 +58,7 @@ See [the grammar and AST contract](docs/GRAMMAR.md) for parser productions,
 expression precedence, syntax structures, and diagnostics.
 
 See [semantic checks](docs/SEMANTICS.md) for team symbol resolution, expression
-validation, delivery values, and semantic diagnostics.
+validation, delivery values, cricket rules, and semantic diagnostics.
 
 See [intermediate and target code](docs/TRANSLATION.md) for IR instructions,
 Python generation, and scoring runtime behavior.

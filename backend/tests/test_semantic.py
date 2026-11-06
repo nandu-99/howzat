@@ -11,7 +11,10 @@ from backend.compiler.semantic import evaluate, validate
 
 TEAMS = 'team IND "India";\nteam AUS "Australia";\n'
 def ast_for(deliveries='0, 1, 4, 0, 2, 6', teams=TEAMS, identifier='IND'):
-    return parse(tokenize(teams + f'innings {identifier} {{ over 1 {{ ' + deliveries + ' } }'))[0]
+    ast = parse(tokenize(teams + f'innings {identifier} {{ over 1 {{ ' + deliveries + ' } }'))[0]
+    over = ast['innings'][0]['overs'][0]
+    over['partial'] = sum(ball['kind'] not in {'wide', 'noball'} for ball in over['deliveries']) < 6
+    return ast
 
 class SemanticTests(unittest.TestCase):
     def test_symbols_and_delivery_report(self):
@@ -50,7 +53,7 @@ class SemanticTests(unittest.TestCase):
         self.assertEqual(len(report['symbol_table']), 2)
 
     def test_both_innings_references_are_resolved(self):
-        source = TEAMS + 'innings IND { over 1 { 1 } } innings AUS { over 1 { 2 } }'
+        source = TEAMS + 'innings IND { over 1 partial { 1 } } innings AUS { over 1 partial { 2 } }'
         report = validate(parse(tokenize(source))[0])
         self.assertEqual([row['team'] for row in report['checks']], ['IND', 'AUS'])
 
@@ -64,8 +67,8 @@ class SemanticTests(unittest.TestCase):
         self.assertEqual(ast['innings'][0]['overs'][0]['deliveries'][0]['value']['type'], 'Binary')
 
     def test_all_delivery_values_and_source_indices(self):
-        report = validate(ast_for('wide, noball, wicket, bye(1), bye(4), legbye(1), legbye(4), run(0), run(6)'))
-        self.assertEqual([row['value'] for row in report['checks']], [1, 1, 0, 1, 4, 1, 4, 0, 6])
+        report = validate(ast_for('wide, noball, wicket, bye(1), bye(4), legbye(1), legbye(4), run(6)'))
+        self.assertEqual([row['value'] for row in report['checks']], [1, 1, 0, 1, 4, 1, 4, 6])
         self.assertEqual(report['checks'][2]['delivery'], 3)
         self.assertEqual(report['checks'][2]['kind'], 'wicket')
 

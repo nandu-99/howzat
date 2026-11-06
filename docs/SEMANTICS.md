@@ -1,4 +1,4 @@
-# Symbol resolution and value checks
+# Semantic analysis and cricket rules
 
 `backend/compiler/semantic.py` exposes `validate(ast)`. The compiler driver calls
 it after parsing and before intermediate code generation.
@@ -29,6 +29,27 @@ expressions intact in the AST for IR generation and optimization.
 Invalid values point to the delivery's source token. Expression overflow points
 to its operator instead. All diagnostics use the shared CompileError format.
 
+## Over and innings rules
+
+- Overs start at 1 and increase by one without gaps or repeats.
+- A full over has exactly six legal deliveries. A wicket uses a legal ball;
+  wides and no-balls do not. Nothing may follow the sixth legal ball in that over.
+- Only the final over may be `partial`, with fewer than six legal balls. It can
+  contain only extras and therefore zero legal balls, but must contain a delivery.
+- A team may have at most one innings. No delivery is allowed after wicket ten.
+- Closing a brace or finishing a full over does not finish an innings. `complete`
+  explicitly finishes it; all-out and reaching a confirmed target also finish it.
+- A finished first innings establishes target = runs + 1. The second innings must
+  stop at the winning delivery, including a winning wide or boundary. The whole
+  boundary value is credited.
+- If the first innings is unfinished, a second innings snapshot has no confirmed
+  target. No target-based completion or winner is inferred from that snapshot.
+- A chase level with the first score is still in progress unless marked complete
+  or all out. Winning by runs or a tie requires a finished chase.
+
+An all-out or successful chase ending before six legal balls still uses `partial`
+for that final over. `innings IND complete` with a partial final over is supported.
+
 ## Report
 
 The return value is JSON-compatible:
@@ -36,7 +57,9 @@ The return value is JSON-compatible:
 ```text
 {
   symbol_table: {identifier: {kind, name, line, column, end_column}},
-  checks: [{team, over, delivery, kind, value, status, line, column, end_column}],
+  checks: [{team, over, delivery, kind, value, legal, status, line, column, end_column}],
+  over_checks: [{team, over, partial, legal_balls, deliveries, wickets_so_far, status, ...position}],
+  innings_checks: [{team, runs, wickets, legal_balls, target, complete, completion_reason, status, ...position}],
   validated_ast: original AST
 }
 ```
@@ -46,7 +69,7 @@ wides and no-balls. It is not the count of legal balls. `value` is the evaluated
 value of that individual delivery, not a cumulative score. A successful report
 contains only valid entries; the first failure stops compilation.
 
-The semantic output view displays symbols and delivery values. Source buttons
-select declarations or deliveries in the editor. Over length, over sequence,
-wicket totals, and match progression are separate rule checks; this report's
-entries describe symbol and delivery-value validation.
+The semantic output view displays symbols, legal-ball and over checks, innings
+progression, and individual delivery values. Source buttons select declarations,
+overs, innings, or deliveries in the editor. Rule errors use the existing error
+panel and source selection. Validation leaves the AST unchanged.

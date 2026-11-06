@@ -39,10 +39,11 @@ export interface SyntaxOutput { ast: Program; parse_tree: ParseTree }
 
 export interface TeamSymbol extends SourcePosition { kind: 'team'; name: string }
 export interface DeliveryCheck extends SourcePosition {
-  team: string; over: number; delivery: number; kind: Delivery['kind']; value: number; status: 'valid';
+  team: string; over: number; delivery: number; kind: Delivery['kind']; value: number; status: 'valid'; legal: boolean;
 }
 export interface SemanticOutput {
   symbol_table: Record<string, TeamSymbol>; checks: DeliveryCheck[]; validated_ast: Program;
+  over_checks: OverCheck[]; innings_checks: InningsCheck[];
 }
 
 export type Operand = number | string;
@@ -58,4 +59,14 @@ export interface TargetOutput { code: string; scorecard: ScoreData }
 export interface OptimizationOutput {
   before: string; after: string; changes: string[];
   before_count: number; after_count: number; instructions: Instruction[];
+}
+
+export interface OverCheck extends SourcePosition {
+  team: string; over: number; partial: boolean; legal_balls: number; deliveries: number;
+  wickets_so_far: number; status: 'valid';
+}
+export interface InningsCheck extends SourcePosition {
+  team: string; runs: number; wickets: number; legal_balls: number; target: number | null;
+  complete: boolean; completion_reason: 'target_reached' | 'all_out' | 'marked_complete' | null;
+  status: 'valid';
 }
