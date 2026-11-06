@@ -13,6 +13,9 @@ from backend.compiler.pipeline import compile_events, load_phase
 TEAMS = 'team IND "India"; team AUS "Australia"; '
 def ast_for(deliveries='0, 1, 4, 0, 2, 6'):
     ast, _ = parse(tokenize(TEAMS + 'innings IND { over 1 { ' + deliveries + ' } }'))
+    for innings in ast["innings"]:
+        for over in innings["overs"]:
+            over["partial"] = sum(ball["kind"] not in {"wide", "noball"} for ball in over["deliveries"]) < 6
     validate(ast)
     return ast
 
@@ -33,7 +36,7 @@ class IRTests(unittest.TestCase):
         self.assertEqual(instructions[-2]['value'], 't2')
 
     def test_temporaries_are_unique_across_deliveries_and_innings(self):
-        source = TEAMS + 'innings IND { over 1 { run(1+1), run(2*2) } } innings AUS { over 1 { run(1+2) } }'
+        source = TEAMS + 'innings IND { over 1 partial { run(1+1), run(2*2) } } innings AUS { over 1 partial { run(1+2) } }'
         ast, _ = parse(tokenize(source))
         validate(ast)
         ir = generate_ir(ast)

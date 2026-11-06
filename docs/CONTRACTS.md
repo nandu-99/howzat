@@ -37,7 +37,8 @@ Leaf token nodes may add `lexeme`. Phase output can be inspected as JSON.
 ## Semantic report
 
 See [symbol resolution and value checks](SEMANTICS.md) for the symbol table,
-evaluated delivery reports, and source diagnostics. Validation preserves the AST.
+evaluated delivery reports, over and innings checks, and source diagnostics.
+Validation preserves the AST.
 
 ## Errors
 
