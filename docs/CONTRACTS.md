@@ -94,3 +94,14 @@ Phase UI components accept the corresponding `output` and are connected in
 
 Tests inject phase fixtures to verify orchestration and scoring integration.
 Fixtures are only in tests and are never exposed as compiler features.
+
+## Execution boundary and diagnostics
+
+The execution helper validates innings objects, unique team IDs, score types,
+wicket bounds, overs notation, completion flags, and optional extras/history
+before returning data. Invalid scoring output raises CompileError in phase six.
+The frontend does not present runtime errors as locations in the source language.
+
+The editor selects bounded source spans and scrolls them into view. A cancelled
+request cannot update the current phases or scorecard. Only source text is saved
+in sessionStorage; compiler results are preserved during route navigation.

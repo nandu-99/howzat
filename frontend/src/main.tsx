@@ -17,15 +17,16 @@ import { LanguageGuide } from './LanguageGuide';
 import './styles.css';
 
 const emptyPhases = (): PhaseEvent[] => PHASE_NAMES.map((name, phase) => ({ phase, name, status: 'pending' }));
-function App() {
+export function App() {
   const location = useLocation();
   const navigate = useNavigate();
   const { health, message, refresh } = useBackendConnection();
-  const [source, setSource] = useState('');
+  const [source, setSource] = useState(() => { try { return sessionStorage.getItem('howzat.source') ?? ''; } catch { return ''; } });
   const [examples, setExamples] = useState<Example[]>([]);
   const [exampleError, setExampleError] = useState('');
   const [exampleRetry, setExampleRetry] = useState(0);
-  const sourceTouched = useRef(false);
+  const sourceTouched = useRef(Boolean(source));
+  useEffect(() => { try { sessionStorage.setItem('howzat.source', source); } catch { /* Storage can be disabled. */ } }, [source]);
   const [phases, setPhases] = useState(emptyPhases);
   const [selected, setSelected] = useState(0);
   const [score, setScore] = useState<ScoreData | null>(null);
@@ -54,6 +55,10 @@ function App() {
     setScore(null); setSelected(0); setRequestError(''); navigate('/');
   };
   const chosen = examples.find(example => example.source === source);
+  const cancel = () => {
+    stop(); setRequestError('Compilation cancelled.');
+    setPhases(previous => previous.map(phase => phase.status === 'pending' || phase.status === 'running' ? {...phase, status: 'skipped'} : phase));
+  };
   const compile = async () => {
     if (active.current || !health || !source.trim()) return;
     const controller = new AbortController(); active.current = controller;
@@ -73,6 +78,7 @@ function App() {
       });
     } catch (error) {
       if (active.current === controller) {
+        setScore(null);
         setRequestError(controller.signal.aborted ? 'Compilation timed out. Please retry.' : error instanceof Error ? error.message : 'Compilation failed.');
         setPhases(previous => previous.map(phase => phase.status === 'running' ? { ...phase, status: 'failed' } : phase.status === 'pending' ? { ...phase, status: 'skipped' } : phase));
       }
@@ -86,6 +92,8 @@ function App() {
     if (!editor.current) return;
     const [start, end] = sourceRange(source, position.line, position.column, position.end_column);
     editor.current.focus(); editor.current.setSelectionRange(start, end);
+    const lineHeight = parseFloat(getComputedStyle(editor.current).lineHeight) || 24;
+    editor.current.scrollTop = Math.max(0, (position.line - 1) * lineHeight - editor.current.clientHeight / 2);
   };
   const locate = () => { if (phase.error) locatePosition(phase.error); };
   const locateToken = (token: Token) => locatePosition(token);
@@ -102,13 +110,13 @@ function App() {
               {(['Correct examples', 'Errors'] as const).map(group => <optgroup key={group} label={group}>{examples.filter(example => example.group === group).map(example => <option key={example.id} value={example.id}>{example.name}</option>)}</optgroup>)}
             </select>
             {exampleError && <p role="alert">{exampleError} <button onClick={() => setExampleRetry(value => value + 1)}>Retry</button></p>}
-            {chosen && <><p>{chosen.description}</p><p className="expected">{chosen.expected}</p>{chosen.fixed_source && <><p>{chosen.fix}</p><button onClick={() => loadSource(chosen.fixed_source!)}>Load corrected code</button></>}</>}
+            {chosen && <><p>{chosen.description}</p><p className="expected">{chosen.expected}</p></>}
           </div>
           <label className="sr-only" htmlFor="source">Howzat source code</label>
           <textarea id="source" ref={editor} value={source} spellCheck={false} maxLength={50000} placeholder="Enter Howzat code here…" onChange={event => {
             sourceTouched.current = true; stop(); setSource(event.target.value); setPhases(emptyPhases()); setScore(null); setRequestError('');
           }} onKeyDown={event => { if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') { event.preventDefault(); void compile(); } }}/>
-          <div className="compile-row"><span>Ctrl / ⌘ + Enter</span><button className="primary" disabled={busy || !health || !source.trim()} onClick={() => void compile()}>{busy ? 'Compiling…' : 'Compile →'}</button></div>
+          <div className="compile-row"><span>Ctrl / ⌘ + Enter</span>{busy && <button onClick={cancel}>Cancel</button>}<button className="primary" disabled={busy || !health || !source.trim()} onClick={() => void compile()}>{busy ? 'Compiling…' : 'Compile →'}</button></div>
         </section>
         <Scorecard data={score}/>
       </aside>
@@ -116,8 +124,8 @@ function App() {
         <PhaseOverview phases={phases} selected={selected} onSelect={setSelected}/>
         {requestError && <p className="error" role="alert">{requestError}</p>}
         <section className="phase-detail" aria-live="polite"><div className="section-heading"><h2>{selected + 1}. {phase.name}</h2><span>{phase.status}{phase.duration_ms !== undefined ? ` · ${phase.duration_ms} ms` : ''}</span></div>
-          {phase.error ? <ErrorDetails error={phase.error} onLocate={locate}/> : phase.output !== undefined ? selected === 0 ? <TokenOutput tokens={(phase.output as LexicalOutput).tokens} onLocate={locateToken}/> : selected === 1 ? <SyntaxOutput output={phase.output as SyntaxData}/> : selected === 2 ? <SemanticOutput output={phase.output as SemanticData} onLocate={locatePosition}/> : selected === 3 ? <IntermediateOutput output={phase.output as IntermediateData}/> : selected === 4 ? <OptimizationOutput output={phase.output as OptimizationData}/> : selected === 5 ? <TargetOutput output={phase.output as TargetData}/> : <pre>{JSON.stringify(phase.output, null, 2)}</pre> : <p>{phase.message || (phase.status === 'running' ? 'Processing…' : phase.status === 'skipped' ? 'An earlier phase did not finish.' : 'Compile your code to inspect this phase.')}</p>}
-          <div className="phase-navigation"><button disabled={selected === 0} onClick={() => setSelected(selected - 1)}>← Previous</button><button disabled={selected === 5} onClick={() => setSelected(selected + 1)}>Next phase →</button></div>
+          {phase.error ? <ErrorDetails error={phase.error} phaseName={phase.name} onLocate={selected === 5 ? undefined : locate} fix={chosen?.failure_phase === selected ? chosen.fix : undefined} onCorrect={chosen?.failure_phase === selected && chosen.fixed_source ? () => loadSource(chosen.fixed_source!) : undefined}/> : phase.output !== undefined ? selected === 0 ? <TokenOutput tokens={(phase.output as LexicalOutput).tokens} onLocate={locateToken}/> : selected === 1 ? <SyntaxOutput output={phase.output as SyntaxData}/> : selected === 2 ? <SemanticOutput output={phase.output as SemanticData} onLocate={locatePosition}/> : selected === 3 ? <IntermediateOutput output={phase.output as IntermediateData}/> : selected === 4 ? <OptimizationOutput output={phase.output as OptimizationData}/> : selected === 5 ? <TargetOutput output={phase.output as TargetData}/> : <pre>{JSON.stringify(phase.output, null, 2)}</pre> : <p>{phase.message || (phase.status === 'running' ? 'Processing…' : phase.status === 'skipped' ? 'An earlier phase did not finish.' : 'Compile your code to inspect this phase.')}</p>}
+          <div className="phase-navigation"><button disabled={selected === 0} onClick={() => setSelected(selected - 1)}>← Previous</button>{selected === 5 && score ? <button onClick={() => { const card = document.getElementById('scorecard'); card?.scrollIntoView({behavior: 'smooth', block: 'nearest'}); card?.focus(); }}>View scorecard →</button> : <button disabled={selected === 5} onClick={() => setSelected(selected + 1)}>Next phase →</button>}</div>
         </section>
       </section>
     </main>
@@ -126,4 +134,5 @@ function App() {
     {location.pathname !== '/' && location.pathname !== '/language' && <article className="language-guide"><h1>Page not found</h1><p><Link to="/">Open the playground</Link></p></article>}
   </>;
 }
-createRoot(document.getElementById('root')!).render(<StrictMode><BrowserRouter><App/></BrowserRouter></StrictMode>);
+const rootElement = document.getElementById('root');
+if (rootElement) createRoot(rootElement).render(<StrictMode><BrowserRouter><App/></BrowserRouter></StrictMode>);

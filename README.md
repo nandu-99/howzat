@@ -39,6 +39,13 @@ npm run dev
 
 ## Checks
 
+Frontend flow tests use jsdom and actual compiler events produced by Python.
+Install the Python environment first. The tests cover all eight examples, fixes,
+source selection, navigation, offline recovery, and cancelled requests. Tree and
+graph canvas renderers are replaced in these DOM tests; their transformations
+have separate tests.
+
+
 ```bash
 .venv/bin/python -m unittest discover -s backend/tests -v
 npm --prefix frontend test
@@ -57,6 +64,21 @@ example explains its expected result; error examples include corrected code.
 Open `/language` for tokens and regex, cricket rules, the CFG, and examples with
 ASTs, parse trees, derivations, and token paths. Try in playground loads the chosen
 source. Navigation preserves the current editor and compiler output.
+
+## Diagnostics and scorecards
+
+A failed phase shows its message and source location. Show in editor selects and
+scrolls to the offending span. Error examples offer their fix and corrected code
+beside the diagnostic. Execution failures show a phase message without selecting
+an unrelated source line.
+
+Compile runs the six phases in order. Cancel stops the active request, and old
+responses cannot replace newer source or scores. Backend failures allow retry.
+Editor text is saved for the current browser session, including across refresh.
+
+Successful execution displays a match result, team scores, extras breakdowns,
+run rates, and expandable delivery history. The final phase offers View scorecard.
+Generated scoring data is validated before results reach the interface.
 
 ## Language
 
