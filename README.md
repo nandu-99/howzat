@@ -60,6 +60,9 @@ expression precedence, syntax structures, and diagnostics.
 See [semantic checks](docs/SEMANTICS.md) for team symbol resolution, expression
 validation, delivery values, and semantic diagnostics.
 
+See [intermediate and target code](docs/TRANSLATION.md) for IR instructions,
+Python generation, and scoring runtime behavior.
+
 ## Architecture
 
 Read [the compiler contracts](docs/CONTRACTS.md) for module interfaces and data formats.
