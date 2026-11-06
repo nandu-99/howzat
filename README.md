@@ -66,6 +66,9 @@ Python generation, and scoring runtime behavior.
 See [constant optimization](docs/OPTIMIZATION.md) for folding, propagation,
 and the before/after comparison.
 
+See [syntax visualizations](docs/SYNTAX-VIEWS.md) for tree controls, selected-delivery
+grammar examples, derivations, and token state paths.
+
 ## Architecture
 
 Read [the compiler contracts](docs/CONTRACTS.md) for module interfaces and data formats.

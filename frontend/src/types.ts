@@ -70,3 +70,5 @@ export interface InningsCheck extends SourcePosition {
   complete: boolean; completion_reason: 'target_reached' | 'all_out' | 'marked_complete' | null;
   status: 'valid';
 }
+
+export type ParseTreeNode = ParseTree;
