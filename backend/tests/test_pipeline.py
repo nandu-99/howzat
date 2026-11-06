@@ -66,7 +66,7 @@ class PipelineTests(unittest.TestCase):
             health = client.get("/api/health").json()
             self.assertEqual(health["api_version"], 1)
             self.assertEqual(len(health["phases"]), 6)
-            response = client.post("/api/compile", json={"source": 'team IND "India"; innings IND { over 1 { 0 } }'})
+            response = client.post("/api/compile", json={"source": 'team IND "India"; team AUS "Australia"; innings IND { over 1 { 0, 1, 4, 0, 2, 6 } }'})
             self.assertEqual(response.status_code, 200)
             self.assertIn("application/x-ndjson", response.headers["content-type"])
             events = [json.loads(line) for line in response.text.splitlines()]
@@ -76,7 +76,10 @@ class PipelineTests(unittest.TestCase):
             self.assertEqual(events[2]["status"], "running")
             self.assertEqual(events[3]["status"], "completed")
             self.assertIn("ast", events[3]["output"])
-            self.assertEqual(events[4]["status"], "unavailable")
+            self.assertEqual(events[4]["status"], "running")
+            self.assertEqual(events[5]["status"], "completed")
+            self.assertIn("IND", events[5]["output"]["symbol_table"])
+            self.assertEqual(events[6]["status"], "unavailable")
             self.assertEqual(client.post("/api/compile", json={"source": ""}).status_code, 422)
             self.assertEqual(client.post("/api/compile", json={"source": "a" * 50001}).status_code, 422)
 

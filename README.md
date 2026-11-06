@@ -57,6 +57,9 @@ in the editor.
 See [the grammar and AST contract](docs/GRAMMAR.md) for parser productions,
 expression precedence, syntax structures, and diagnostics.
 
+See [semantic checks](docs/SEMANTICS.md) for team symbol resolution, expression
+validation, delivery values, and semantic diagnostics.
+
 ## Architecture
 
 Read [the compiler contracts](docs/CONTRACTS.md) for module interfaces and data formats.

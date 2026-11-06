@@ -34,6 +34,11 @@ See [the grammar and AST contract](GRAMMAR.md) for complete node fields.
 Concrete tree nodes use `{symbol: string, children: TreeNode[]}`.
 Leaf token nodes may add `lexeme`. Phase output can be inspected as JSON.
 
+## Semantic report
+
+See [symbol resolution and value checks](SEMANTICS.md) for the symbol table,
+evaluated delivery reports, and source diagnostics. Validation preserves the AST.
+
 ## Errors
 
 Raise `CompileError(message, line, column, end_column=None)` from `errors.py`.
