@@ -40,3 +40,13 @@ test('clamps out-of-range source positions', () => {
   const [start, end] = sourceRange('abc', 99, 99);
   assert.equal(start, 3); assert.equal(end, 3);
 });
+test('source highlighting never crosses into the next line', () => {
+  const text = 'abc\ndef';
+  const [start, end] = sourceRange(text, 1, 2, 99);
+  assert.equal(text.slice(start, end), 'bc');
+});
+test('source highlighting handles CRLF without selecting the carriage return', () => {
+  const text = 'abc\r\ndef';
+  assert.equal(text.slice(...sourceRange(text, 1, 2, 99)), 'bc');
+  assert.equal(text.slice(...sourceRange(text, 2, 1, 3)), 'de');
+});

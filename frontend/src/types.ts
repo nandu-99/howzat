@@ -9,6 +9,9 @@ export interface Health { status: string; api_version: number; phases: {phase: n
 export interface Innings {
   team: string; name: string; runs: number; wickets: number; overs_display: string;
   complete: boolean; total_extras?: number;
+  extras?: Record<'wide' | 'noball' | 'bye' | 'legbye', number>;
+  history?: {kind: string; value: number; runs: number; legal: boolean; over: number; ball: number; score: string}[];
+  run_rate?: number; completion_reason?: string | null;
 }
 export interface MatchResult { status: string; message: string; detail: string }
 export interface ScoreData { innings: Innings[]; result: MatchResult }

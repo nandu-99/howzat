@@ -39,5 +39,6 @@ export function sourceRange(source: string, line: number, column: number, endCol
   const row = Math.max(0, Math.min(line - 1, lines.length - 1));
   const start = lines.slice(0, row).reduce((sum, text) => sum + text.length + 1, 0)
     + Math.max(0, Math.min(column - 1, lines[row].length));
-  return [start, Math.min(source.length, start + Math.max(1, (endColumn ?? column + 1) - column))] as const;
+  const lineEnd = start + Math.max(0, lines[row].replace(/\r$/, '').length - Math.min(column - 1, lines[row].length));
+  return [start, Math.min(lineEnd, start + Math.max(1, (endColumn ?? column + 1) - column))] as const;
 }
