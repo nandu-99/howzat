@@ -54,6 +54,9 @@ See [the language definition](docs/LANGUAGE.md) for keywords, token patterns,
 and source conventions. Select a token value in the lexical output to locate it
 in the editor.
 
+See [the grammar and AST contract](docs/GRAMMAR.md) for parser productions,
+expression precedence, syntax structures, and diagnostics.
+
 ## Architecture
 
 Read [the compiler contracts](docs/CONTRACTS.md) for module interfaces and data formats.
