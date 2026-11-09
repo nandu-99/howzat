@@ -1,7 +1,8 @@
 import type { ScoreData } from './types';
+import { ClipboardIcon } from '@radix-ui/react-icons';
 import { MatchResult } from './MatchResult';
 export function Scorecard({ data }: { data: ScoreData | null }) {
-  return <section id="scorecard" tabIndex={-1} className="scorecard" aria-label="Scorecard"><h2>Scorecard</h2>{!data ? <p>Compile your code to see the score.</p> : <>
+  return <section id="scorecard" tabIndex={-1} className="scorecard" aria-label="Scorecard"><div className="scorecard-heading"><h2>Scorecard</h2><span>Match result</span></div>{!data ? <div className="score-empty"><ClipboardIcon aria-hidden="true"/><p>Compile your code to see the score.</p></div> : <>
     <MatchResult result={data.result}/>{data.innings.map(card => <article key={card.team}>
       <div className="score-row"><strong>{card.name}</strong><strong>{card.runs}/{card.wickets}</strong></div>
       <p>{card.overs_display} overs · {card.total_extras ?? 0} extras · {card.complete ? 'Finished' : 'In progress'}{card.run_rate !== undefined ? ` · Run rate ${card.run_rate}` : ''}</p>

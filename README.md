@@ -111,3 +111,9 @@ positions, and generated Python executes with a time limit to return scoring dat
 
 The frontend uses a 30/70 desktop layout with an editor, a compact phase strip,
 phase output details, and a scorecard.
+
+## Visual theme
+
+The application uses warm white surfaces, forest-green actions, locally hosted
+Source Serif 4 / Geist / Geist Mono fonts, and a shared responsive layout.
+Logo and stadium assets are bundled with the frontend. See [design details](docs/DESIGN.md).
