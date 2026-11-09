@@ -74,6 +74,10 @@ test('all eight examples, error selection, corrections, match results, and navig
   offline=false;hold=false;const app=await mount();
   try {
     assert.equal(app.host.querySelectorAll('#example optgroup option').length,8);
+    assert.equal(app.host.querySelector('#example').tagName,'SELECT');
+    assert.equal(app.host.querySelector('.brand-mark').getAttribute('src'),'/assets/howzat-mark-128.png');
+    assert.equal(app.host.querySelectorAll('.workflow li').length,3);
+    assert.ok(app.host.querySelector('#source').classList.contains('source-textarea'));
     for (const example of fixture.examples) {
       await select(app.host,example.id);
       await click(app.host.querySelector('.primary'));
@@ -92,6 +96,7 @@ test('all eight examples, error selection, corrections, match results, and navig
         assert.ok(app.host.querySelector('.score-row'));
       } else {
         assert.equal(app.host.querySelectorAll('.phase-strip .completed').length,6);
+        assert.equal(app.host.querySelector('.phase-total').textContent,'6/6');
         assert.ok(app.host.querySelector('.score-row'));
       }
     }
