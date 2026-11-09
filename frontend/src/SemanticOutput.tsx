@@ -5,7 +5,10 @@ export function SemanticOutput({ output, onLocate }: {
   output: SemanticData; onLocate: (position: SourcePosition) => void;
 }) {
   return <div className="semantic-output">
-    <p>Team references, delivery values, overs, and innings rules are valid.</p>
+    <div className="semantic-summary"><strong><span aria-hidden="true">✓</span> Cricket rules checked</strong>
+      <p>Team references, delivery values, overs, and innings rules are valid.</p>
+      <dl><div><dt>Teams</dt><dd>{Object.keys(output.symbol_table).length}</dd></div><div><dt>Overs</dt><dd>{output.over_checks.length}</dd></div><div><dt>Deliveries</dt><dd>{output.checks.length}</dd></div></dl>
+    </div>
     <h3>Symbol table</h3>
     <div className="semantic-scroll"><table>
       <caption className="sr-only">Declared team symbols</caption>

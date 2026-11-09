@@ -1,1 +1,18 @@
-.semantic-output{padding:0 16px 16px}.semantic-output>p{font-size:12px;margin:14px 0}.semantic-output h3{font-size:13px;margin:18px 0 10px;font-weight:600}.semantic-output h3 span{color:var(--muted);font-weight:400}.semantic-scroll{max-height:40vh;overflow:auto;border:1px solid var(--line);border-radius:5px}.semantic-output table{width:100%;border-collapse:collapse;text-align:left;font-size:13px}.semantic-output th{position:sticky;top:0;z-index:1;background:#1a271e;color:var(--muted);font-weight:500}.semantic-output th,.semantic-output td{padding:9px 12px;border-bottom:1px solid var(--line);white-space:nowrap}.semantic-output td:nth-child(2){white-space:normal;overflow-wrap:anywhere}.semantic-output tr:last-child td{border-bottom:0}.semantic-output code{font:13px ui-monospace,SFMono-Regular,Consolas,monospace}.semantic-output td button{padding:3px 6px;font-size:12px}
+.semantic-output{padding:0 16px 16px}.semantic-output>p{font-size:12px;margin:14px 0}.semantic-output h3{font-size:13px;margin:18px 0 10px;font-weight:600}.semantic-output h3 span{color:var(--muted);font-weight:400}.semantic-scroll{max-height:40vh;overflow:auto;border:1px solid var(--line);border-radius:5px}.semantic-output table{width:100%;border-collapse:collapse;text-align:left;font-size:13px}.semantic-output th{position:sticky;top:0;z-index:1;background:var(--surface);color:var(--muted);font-weight:500}.semantic-output th,.semantic-output td{padding:9px 12px;border-bottom:1px solid var(--line);white-space:nowrap}.semantic-output td:nth-child(2){white-space:normal;overflow-wrap:anywhere}.semantic-output tr:last-child td{border-bottom:0}.semantic-output code{font:12px var(--mono)}.semantic-output td button{padding:3px 6px;font-size:12px}
+
+
+.semantic-summary { margin: 16px 0 22px; padding: 15px 17px; border: 1px solid #cddbbc; border-radius: 6px; background: var(--accent-soft); }
+.semantic-summary>strong { color: var(--accent); font-size: 13px; font-weight: 600; }
+.semantic-summary>strong span { margin-right: 6px; }
+.semantic-summary p { font-size: 12px; margin: 7px 0 13px; }
+.semantic-summary dl { display: flex; flex-wrap: wrap; gap: 12px 26px; margin: 0; }
+.semantic-summary dl>div { display: flex; align-items: baseline; gap: 8px; }
+.semantic-summary dt { color: var(--muted); font-size: 11px; }
+.semantic-summary dd { margin: 0; color: var(--accent); font: 12px var(--mono); }
+.semantic-output th { font-size: 10px; letter-spacing: .3px; }
+.semantic-output table { font-size: 12px; }
+.semantic-output tbody tr:hover { background: #f4f5ed; }
+.semantic-output td button { background: var(--panel); color: var(--accent); font: 11px var(--mono); }
+.semantic-output td button:hover:not(:disabled) { color: var(--accent-hover); background: var(--accent-soft); border-color: #a8bc92; }
+.semantic-output td.completed { color: var(--accent); font-size: 11px; }
+@media (max-width: 560px) { .semantic-summary { padding: 12px; }.semantic-output th,.semantic-output td { padding: 8px 9px; } }
