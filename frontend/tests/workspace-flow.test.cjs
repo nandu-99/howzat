@@ -16,9 +16,13 @@ from backend.compiler.pipeline import compile_events
 sources = [e['source'] for e in EXAMPLES] + [e['fixed_source'] for e in EXAMPLES if 'fixed_source' in e]
 print(json.dumps({'health':health(), 'examples':EXAMPLES, 'reference':language_reference(), 'events':{s:list(compile_events(s)) for s in sources}}))
 `], {cwd:repo,encoding:'utf8',maxBuffer:20*1024*1024}));
-const dom = new JSDOM('<!doctype html><html><body></body></html>', {url:'http://localhost:5173/'});
+const dom = new JSDOM('<!doctype html><html><body></body></html>', {url:'http://localhost:5173/',pretendToBeVisual:true});
 for (const [key,value] of Object.entries({window:dom.window,document:dom.window.document,navigator:dom.window.navigator,HTMLElement:dom.window.HTMLElement,sessionStorage:dom.window.sessionStorage,getComputedStyle:dom.window.getComputedStyle,IS_REACT_ACT_ENVIRONMENT:true})) Object.defineProperty(globalThis,key,{value,writable:true,configurable:true});
 dom.window.HTMLElement.prototype.scrollIntoView = function() {};
+for (const key of ['Element','Node','NodeFilter','MutationObserver','CustomEvent','HTMLSelectElement','HTMLFormElement','HTMLInputElement','DocumentFragment']) globalThis[key]=dom.window[key];
+globalThis.ResizeObserver=class { observe() {} unobserve() {} disconnect() {} };
+globalThis.requestAnimationFrame=dom.window.requestAnimationFrame.bind(dom.window);
+globalThis.cancelAnimationFrame=dom.window.cancelAnimationFrame.bind(dom.window);
 const React = require('react');
 const {act} = React;
 const {createRoot} = require('react-dom/client');
@@ -67,17 +71,24 @@ async function mount() {
   return {host,async close(){await act(async()=>root.unmount());host.remove();}};
 }
 async function click(element) { assert.ok(element);await act(async()=>element.dispatchEvent(new window.MouseEvent('click',{bubbles:true,cancelable:true}))); }
-async function select(host,id) { await act(async()=>{const picker=host.querySelector('#example');picker.value=id;picker.dispatchEvent(new window.Event('change',{bubbles:true}));}); }
+async function select(host,id) {
+  await click(host.querySelector('#example'));
+  const label=fixture.examples.find(example=>example.id===id).name;
+  const option=[...document.querySelectorAll('[role="option"]')].find(option=>option.textContent.trim()===label);
+  await click(option);
+}
 const button = (host,label)=>[...host.querySelectorAll('button')].find(button=>button.textContent===label);
 
 test('all eight examples, error selection, corrections, match results, and navigation work together', async()=>{
   offline=false;hold=false;const app=await mount();
   try {
-    assert.equal(app.host.querySelectorAll('#example optgroup option').length,8);
-    assert.equal(app.host.querySelector('#example').tagName,'SELECT');
+    assert.equal(app.host.querySelector('#example').getAttribute('role'),'combobox');
     assert.equal(app.host.querySelector('.brand-mark').getAttribute('src'),'/assets/howzat-mark-128.png');
     assert.equal(app.host.querySelectorAll('.workflow li').length,3);
-    assert.ok(app.host.querySelector('.code-editor #source'));
+    await click(app.host.querySelector('#example'));
+    assert.equal(document.querySelectorAll('[role="option"]').length,8);
+    assert.equal(document.querySelectorAll('.custom-select-group').length,2);
+    await click(document.querySelector('[role="option"]'));
     for (const example of fixture.examples) {
       await select(app.host,example.id);
       assert.equal(app.host.querySelector('.editor-highlight pre').textContent, example.source + '\n');
@@ -105,11 +116,13 @@ test('all eight examples, error selection, corrections, match results, and navig
     await select(app.host,'multiple');await click(app.host.querySelector('.primary'));
     assert.ok(app.host.querySelector('.match-result').textContent.includes('India won by 3 runs'));
     assert.equal(app.host.querySelectorAll('.delivery-history tbody tr').length,24);
+    await click(app.host.querySelectorAll('.phase-strip button')[1]);
     const source=app.host.querySelector('#source').value;
     await click(app.host.querySelector('a[href="/language"]'));
     assert.equal(window.location.pathname,'/language');
     assert.ok(app.host.querySelector('#tokens'));
     const sidebar = app.host.querySelector('.guide-sidebar');
+    assert.ok(sidebar);
     assert.equal(sidebar.querySelectorAll('nav a').length, 7);
     for (const id of ['introduction','syntax','tokens','rules','grammar','examples','pipeline']) assert.ok(app.host.querySelector('#'+id));
     assert.equal(app.host.querySelectorAll('.pipeline-explainer li').length,6);
@@ -124,7 +137,17 @@ test('all eight examples, error selection, corrections, match results, and navig
     await act(async()=>exampleTabs[1].dispatchEvent(new window.KeyboardEvent('keydown',{key:'ArrowRight',bubbles:true,cancelable:true})));
     assert.equal(exampleTabs[2].getAttribute('aria-selected'),'true');
     assert.equal(document.activeElement,exampleTabs[2]);
-
+    await click(exampleTabs[1]);
+    const syntaxTabs=app.host.querySelectorAll('.guide-content .tree-tabs button');
+    const ids=[...app.host.querySelectorAll('.tree-tabs button')].map(tab=>tab.id);
+    assert.equal(new Set(ids).size,ids.length);
+    await act(async()=>syntaxTabs[0].dispatchEvent(new window.KeyboardEvent('keydown',{key:'ArrowRight',bubbles:true})));
+    assert.equal(document.activeElement,syntaxTabs[1]);
+    assert.equal(syntaxTabs[1].getAttribute('aria-selected'),'true');
+    await click(syntaxTabs[2]);
+    await click(app.host.querySelector('.guide-content .delivery-picker [role=combobox]'));
+    await click(document.querySelectorAll('[role=option]')[1]);
+    assert.equal(app.host.querySelector('.guide-content .cfg-selected code').textContent,'wide');
     await click(app.host.querySelector('.app-navigation a[href="/"]'));
     assert.equal(app.host.querySelector('#source').value,source);
     assert.ok(app.host.querySelector('.match-result').textContent.includes('India won by 3 runs'));
@@ -153,6 +176,26 @@ test('cancelled requests cannot restore stale scorecards',async()=>{
     await click(app.host.querySelector('.primary'));
     assert.ok(app.host.querySelector('.score-row').textContent.includes('16/0'));
   } finally {hold=false;await app.close();}
+});
+test('custom menu supports keyboard selection and Escape without changing the value',async()=>{
+  offline=false;hold=false;const app=await mount();
+  const press=async(element,key)=>{await act(async()=>{element.dispatchEvent(new window.KeyboardEvent('keydown',{key,bubbles:true,cancelable:true}));await new Promise(resolve=>setTimeout(resolve,20));});};
+  try {
+    const trigger=app.host.querySelector('#example');
+    await press(trigger,'ArrowDown');
+    assert.equal(trigger.getAttribute('aria-expanded'),'true');
+    assert.equal(document.querySelectorAll('[role=option]').length,8);
+    await press(document.activeElement,'End');
+    assert.equal(document.activeElement.textContent.trim(),fixture.examples.at(-1).name);
+    await press(document.activeElement,'Enter');
+    assert.equal(trigger.getAttribute('aria-expanded'),'false');
+    assert.equal(app.host.querySelector('#source').value,fixture.examples.at(-1).source);
+    assert.equal(document.activeElement,trigger);
+    await press(trigger,'ArrowDown');
+    await press(document.activeElement,'Escape');
+    assert.equal(trigger.getAttribute('aria-expanded'),'false');
+    assert.equal(app.host.querySelector('#source').value,fixture.examples.at(-1).source);
+  } finally {await app.close();}
 });
 
  test('editor scrolling stays aligned and guide examples load into the playground', async()=>{

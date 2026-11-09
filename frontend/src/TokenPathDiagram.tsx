@@ -35,19 +35,19 @@ export function TokenPathDiagram({ tokens }: { tokens: string[] }) {
   const edges = useMemo<Edge[]>(() => [
     { id: 'start', source: 'entry', target: 'q0', targetHandle: 'target-left' },
     ...path.transitions,
-  ].map(edge => ({ ...edge, type: 'smoothstep', markerEnd: { type: MarkerType.ArrowClosed, color: '#b3e987', width: 18, height: 18 },
-    style: { stroke: '#91b879', strokeWidth: 1.8 }, labelStyle: { fill: '#d8eacb', fontSize: 13, fontWeight: 500 },
-    labelBgStyle: { fill: '#1c291c', fillOpacity: 1 }, labelBgPadding: [7, 4], labelBgBorderRadius: 4,
+  ].map(edge => ({ ...edge, type: 'smoothstep', markerEnd: { type: MarkerType.ArrowClosed, color: '#3f6740', width: 18, height: 18 },
+    style: { stroke: '#779274', strokeWidth: 1.8 }, labelStyle: { fill: '#26422b', fontSize: 13, fontWeight: 500 },
+    labelBgStyle: { fill: '#f5f6ed', fillOpacity: 1 }, labelBgPadding: [7, 4], labelBgBorderRadius: 4,
   })), [path]);
 
   return <section className="cfg-diagram" aria-label="Selected delivery state transition diagram">
     <div className="code-label">Token transitions for this delivery</div>
     <div className="cfg-diagram-canvas" style={{ height: Math.min(500, Math.max(250, path.rows * 150 + 100)) }}>
       <ReactFlow key={tokens.join('\u0000')} nodes={nodes} edges={edges} nodeTypes={nodeTypes}
-        colorMode="dark" fitView fitViewOptions={{ padding: 0.2, maxZoom: 1.1 }} minZoom={0.2} maxZoom={2}
+        colorMode="light" fitView fitViewOptions={{ padding: 0.2, maxZoom: 1.1 }} minZoom={0.2} maxZoom={2}
         nodesDraggable={false} nodesConnectable={false} edgesReconnectable={false}
         aria-label="Initial state, token transitions, and final accepting state">
-        <Background color="#324235" gap={20}/>
+        <Background color="#dbe0d1" gap={20}/>
         <Controls showInteractive={false}/>
       </ReactFlow>
     </div>

@@ -17,7 +17,7 @@ helper._compile(ts.transpileModule(fs.readFileSync(helperPath, 'utf8'), {
 const exportsObject = {};
 vm.runInNewContext(ts.transpileModule(fs.readFileSync(path.join(__dirname, '../src/SyntaxOutput.tsx'), 'utf8'), {
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.ReactJSX },
-}).outputText, { exports: exportsObject, require: name => name.endsWith('.css') ? {} : name === './syntaxTrees' ? helper.exports : name === './ParseTree' ? {
+}).outputText, { exports: exportsObject, require: name => name.endsWith('.css') ? {} : name === './CustomSelect' ? {CustomSelect: () => null} : name === './syntaxTrees' ? helper.exports : name === './ParseTree' ? {
   ParseTree: ({tree, label}) => React.createElement('div', {'aria-label': label}, JSON.stringify(tree)),
 } : name === './TokenPathDiagram' ? {TokenPathDiagram: () => null} : require(name) });
 
