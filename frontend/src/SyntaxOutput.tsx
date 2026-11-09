@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useState } from 'react';
 import { ParseTree } from './ParseTree';
+import { CustomSelect } from './CustomSelect';
 import { astToTree, cfgExampleFromTree, collectDeliveries } from './syntaxTrees';
 import type { SyntaxOutput as SyntaxData } from './types';
 import './SyntaxOutput.css';
@@ -7,6 +8,7 @@ import { TokenPathDiagram } from './TokenPathDiagram';
 
 export function SyntaxOutput({ output }: { output: SyntaxData }) {
   const { ast, parse_tree: parseTree } = output;
+  const viewId = `syntax-${useId().replace(/[^A-Za-z0-9_-]/g, '')}`;
   const [tab, setTab] = useState('ast');
   const [selected, setSelected] = useState(0);
   const astTree = useMemo(() => astToTree(ast), [ast]);
@@ -18,15 +20,15 @@ export function SyntaxOutput({ output }: { output: SyntaxData }) {
   return <div className="syntax-output">
     <div className="tree-tabs" role="tablist" aria-label="Syntax analysis results">
       {[['ast', 'AST'], ['parse', 'Parse tree'], ['cfg', 'CFG rules'], ['tokens', 'Token transitions']].map(([id, title]) =>
-        <button key={id} id={`syntax-tab-${id}`} type="button" role="tab" aria-selected={tab === id}
-          aria-controls={`syntax-panel-${id}`} onKeyDown={event => {
+        <button key={id} id={`${viewId}-tab-${id}`} type="button" role="tab" aria-selected={tab === id}
+          aria-controls={`${viewId}-panel-${id}`} onKeyDown={event => {
             const ids = ['ast', 'parse', 'cfg', 'tokens'];
             const index = ids.indexOf(id);
             const next = event.key === 'ArrowRight' ? ids[(index + 1) % 4] : event.key === 'ArrowLeft' ? ids[(index + 3) % 4] : event.key === 'Home' ? ids[0] : event.key === 'End' ? ids[3] : null;
-            if (next) { event.preventDefault(); setTab(next); document.getElementById(`syntax-tab-${next}`)?.focus(); }
+            if (next) { event.preventDefault(); setTab(next); document.getElementById(`${viewId}-tab-${next}`)?.focus(); }
           }} tabIndex={tab === id ? 0 : -1} className={tab === id ? 'active' : ''} onClick={() => setTab(id)}>{title}</button>)}
     </div>
-    <div role="tabpanel" id={`syntax-panel-${tab}`} aria-labelledby={`syntax-tab-${tab}`}>
+    <div role="tabpanel" id={`${viewId}-panel-${tab}`} aria-labelledby={`${viewId}-tab-${tab}`}>
       {tab === 'ast' ? <>
         <p className="tree-explanation">The AST shows the meaning of your code: teams, innings, overs, deliveries, and calculations.</p>
         <ParseTree tree={astTree} kind="ast" label="Abstract syntax tree (AST)"/>
@@ -34,10 +36,8 @@ export function SyntaxOutput({ output }: { output: SyntaxData }) {
         <p className="tree-explanation">The parse tree also keeps grammar rules, punctuation, and empty productions.</p>
         <ParseTree tree={parseTree} label="Concrete parse tree · Full program"/>
       </> : example ? <div className="cfg-example">
-        <div className="delivery-picker"><label htmlFor="syntax-delivery">Choose a delivery</label>
-          <select id="syntax-delivery" value={index} onChange={event => setSelected(Number(event.target.value))}>
-            {deliveries.map((delivery, i) => <option key={i} value={i}>{i + 1}. {delivery.source}</option>)}
-          </select>
+        <div className="delivery-picker"><label htmlFor={`${viewId}-delivery`}>Choose a delivery</label>
+          <CustomSelect id={`${viewId}-delivery`} value={String(index)} onChange={value => setSelected(Number(value))} options={deliveries.map((delivery, i) => ({value: String(i), label: `${i + 1}. ${delivery.source}`}))}/>
         </div>
         <div className="cfg-selected"><span>Selected delivery</span><code>{example.source}</code></div>
         {tab === 'tokens' ? <>

@@ -1,3 +1,4 @@
+import { CustomSelect } from './CustomSelect';
 import { CodeEditor } from './CodeEditor';
 import { StrictMode, useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -109,10 +110,7 @@ export function App() {
       <aside>
         <section className="editor-panel"><div className="section-heading"><h2><FileTextIcon aria-hidden="true"/>Cricket code</h2><span className="language-label">HOWZAT</span></div>
           <div className="example-picker"><label htmlFor="example">Choose an example</label>
-            <select id="example" value={chosen?.id ?? ''} onChange={event => { const example = examples.find(item => item.id === event.target.value); if (example) loadSource(example.source); }} disabled={!examples.length}>
-              <option value="" disabled>{examples.length ? 'Custom code' : 'Loading examples…'}</option>
-              {(['Correct examples', 'Errors'] as const).map(group => <optgroup key={group} label={group}>{examples.filter(example => example.group === group).map(example => <option key={example.id} value={example.id}>{example.name}</option>)}</optgroup>)}
-            </select>
+            <CustomSelect id="example" value={chosen?.id ?? ''} onChange={value => { const example = examples.find(item => item.id === value); if (example) loadSource(example.source); }} disabled={!examples.length} placeholder={examples.length ? 'Custom code' : 'Loading examples…'} options={examples.map(example => ({value: example.id, label: example.name, group: example.group}))}/>
             {exampleError && <p role="alert">{exampleError} <button onClick={() => setExampleRetry(value => value + 1)}>Retry</button></p>}
             {chosen && <><p>{chosen.description}</p><p className="expected"><strong>Expected:</strong> {chosen.expected}</p></>}
           </div>

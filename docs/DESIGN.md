@@ -20,7 +20,7 @@ header, navigation, source panel, phase strip, scorecards, focus, and hover stat
 `theme-surfaces.css` applies shared surface colors to existing output views.
 
 The source editor keeps a native textarea for editing, with a separate highlighted
-layer and line-number gutter. The example picker remains a native select.
+layer and line-number gutter. The example picker uses a custom Radix Select menu.
 Compilation, source selection, diagnostics, and navigation keep their existing
 behavior.
 
@@ -58,3 +58,15 @@ on smaller screens. It documents token regex and keyword meanings, deliveries,
 cricket rules, grammar, examples, derivations, and the compiler phases. Example
 tabs support arrow keys, Home, and End. Source examples share the editor's
 highlighter, with colors adapted to the light reference panels.
+
+## Syntax views and selection controls
+
+Playground examples and syntax deliveries use the shared Radix Select component.
+Grouped options, selected checks, keyboard navigation, Escape dismissal, focus
+restoration, and portaled menus preserve usable controls within narrow panels.
+
+AST and parse-tree canvases use the light theme, with distinct nonterminal,
+terminal, and empty-production colors. Token transitions use light surfaces,
+readable labels, directed arrows, and a double-ring accepting state. Each syntax
+view has unique tab and delivery IDs so the guide and playground cannot redirect
+keyboard focus into one another.

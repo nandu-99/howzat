@@ -7,20 +7,3 @@
 .language-guide>nav { background: var(--bg); }
 .language-guide select { color: var(--text); background: var(--panel); }
 .keyword-list code { color: var(--accent); background: var(--accent-soft); }
-.tree-tabs .active { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
-.tree-tabs button.active:hover:not(:disabled) { background: #e0ebd0; color: var(--accent); border-color: var(--accent); }
-.cfg-selected, .parse-tree-toolbar, .cfg-diagram .code-label { background: var(--surface); border-color: var(--line); color: var(--text); }
-.cfg-selected>span, .parse-tree-toolbar>span, .parse-tree-footer, .cfg-diagram-note, .cfg-transition-list, .delivery-picker label { color: var(--muted); }
-.cfg-selected>code { color: var(--accent); }
-.delivery-picker select { background: var(--panel); color: var(--text); border-color: var(--line); }
-.parse-tree, .cfg-diagram { background: var(--panel); border-color: var(--line); }
-.parse-tree-canvas { background-image: radial-gradient(#dce2d2 1px, transparent 1px); }
-.parse-tree .rd3t-link { stroke: #8fa281; }
-.parse-tree-node rect { fill: #edf3e3; stroke: #a0b88c; }.parse-tree-node text { fill: #2e5029; font-family: var(--mono); }
-.parse-tree-node.terminal rect { fill: #f9f1dc; stroke: #c3ae78; }.parse-tree-node.terminal text { fill: #72521c; }
-.parse-tree-node.epsilon rect { fill: #edf2f4; stroke: #a5b7c0; }.parse-tree-node.epsilon text { fill: #375e75; }
-.parse-tree-node .tree-toggle { fill: #fff; stroke: #8aa274; }.parse-tree-node .tree-toggle-label { fill: var(--accent); }
-.parse-tree-footer { border-color: var(--line); }
-.tree-legend i { background: #edf3e3; border-color: #a0b88c; }.tree-legend .terminal { background: #f9f1dc; border-color: #c3ae78; }.tree-legend .epsilon { background: #edf2f4; border-color: #a5b7c0; }
-.parse-tree-toolbar button { background: var(--panel); color: var(--text); border-color: var(--line); }
-.parse-tree-toolbar button:hover:not(:disabled) { background: #e6eddc; color: var(--accent); border-color: #a7b99a; }
