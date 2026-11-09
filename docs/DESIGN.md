@@ -83,3 +83,15 @@ suggested correction, and recovery actions. Line numbers appear only when an
 original source location is available. Runtime errors do not suggest that a
 generated Python line is an original Howzat line. Error content is rendered as
 text, and the existing editor selection and corrected-example actions are kept.
+
+## Code and optimization views
+
+Intermediate scoring instructions and generated Python use labeled light code
+panels with the shared monospace font. Long listings scroll within the panel;
+keyboard users can focus the code area to scroll without moving page focus.
+
+The optimization view preserves aligned before/after rows, instruction counts,
+folding explanations, and the unchanged-output state. A text legend explains
+minus and plus prefixes, so color is not the only way to identify changed lines.
+Comparisons stack on narrower screens. Output remains escaped text, and no
+compiler or execution behavior changes.
