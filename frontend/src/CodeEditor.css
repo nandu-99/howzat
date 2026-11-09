@@ -1,0 +1,19 @@
+.code-editor { position: relative; height: 336px; background: #172b20; color: #eff0df; color-scheme: dark; overflow: hidden; }
+.editor-gutter { position: absolute; top: 0; left: 0; bottom: 0; width: 45px; overflow: hidden; z-index: 2; background: #172b20; }
+.editor-gutter>div { padding: 18px 9px 18px 0; }
+.editor-gutter span { display: block; text-align: right; font: 12px/24px var(--mono); color: #a8b6a7; }
+.editor-highlight { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.editor-highlight pre { width: max-content; min-width: 100%; padding: 18px 16px 18px 61px; margin: 0; font: 12px/24px var(--mono); white-space: pre; tab-size: 2; max-height: none; overflow: visible; }
+.code-editor textarea { position: absolute; top: 0; left: 45px; width: calc(100% - 45px); height: 100%; margin: 0; padding: 18px 16px; font: 12px/24px var(--mono); white-space: pre; tab-size: 2; resize: none; border: 0; border-radius: 0; background: transparent; color: transparent; -webkit-text-fill-color: transparent; caret-color: #f6f7df; }
+.code-editor textarea::placeholder { color: #a8b6a7; -webkit-text-fill-color: #a8b6a7; }
+.code-editor textarea::selection { background: #b9d78138; color: transparent; }
+.code-editor textarea:focus-visible { outline: 2px solid #a9c68b; outline-offset: -2px; }
+.source-plain { color: #f1f0df; }
+.source-comment { color: #a5b2a2; }
+.source-string { color: #efce7c; }
+.source-number { color: #d8edc3; }
+.source-keyword { color: #c4df9c; font-weight: 500; }
+.source-punctuation { color: #e5d499; }
+@media (min-width: 1600px) { .code-editor { height: 360px; } }
+@media (max-width: 900px) { .code-editor { height: 300px; } }
+@media (max-width: 560px) { .code-editor textarea, .editor-highlight pre, .editor-gutter span { font-size: 11px; } }

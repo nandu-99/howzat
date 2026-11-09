@@ -19,10 +19,10 @@ system fallbacks keep text available while font assets load.
 header, navigation, source panel, phase strip, scorecards, focus, and hover states.
 `theme-surfaces.css` applies shared surface colors to existing output views.
 
-The source control remains a native textarea and the example picker a native
-select. The application shell does not depend on separate highlighting or custom
-selection components. Compilation, source selection, diagnostics, and navigation
-keep their existing behavior.
+The source editor keeps a native textarea for editing, with a separate highlighted
+layer and line-number gutter. The example picker remains a native select.
+Compilation, source selection, diagnostics, and navigation keep their existing
+behavior.
 
 Phase status includes accessible full names and state labels. Pass/fail is shown
 with both icons and color. Selected controls retain readable hover colors.
@@ -45,3 +45,16 @@ Run the frontend tests and production build. Application flow tests use real
 compiler output and cover examples, corrections, scorecards, navigation, offline
 recovery, and cancellation. Canvas renderers are substituted in those DOM tests;
 actual diagram rendering requires browser visual review.
+
+## Editor and language reference
+
+The source editor uses a native textarea over a presentation-only highlighted
+layer, with synchronized line numbers and scrolling. Text editing, source-error
+selection, and Ctrl/Cmd+Enter compilation keep their original behavior. The
+backend lexer remains the authority; highlighting does not validate programs.
+
+The language guide uses a sticky section sidebar on desktop and a stacked layout
+on smaller screens. It documents token regex and keyword meanings, deliveries,
+cricket rules, grammar, examples, derivations, and the compiler phases. Example
+tabs support arrow keys, Home, and End. Source examples share the editor's
+highlighter, with colors adapted to the light reference panels.
