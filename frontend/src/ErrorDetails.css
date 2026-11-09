@@ -1,0 +1,11 @@
+.diagnostic { border-left: 3px solid var(--danger); }
+.diagnostic-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+.diagnostic-heading>strong { font-size: 13px; font-weight: 600; }
+.diagnostic-heading>strong>span { display: inline-grid; place-items: center; width: 18px; height: 18px; margin-right: 5px; border: 1px solid currentColor; border-radius: 50%; font-size: 15px; }
+.diagnostic-location { padding: 4px 7px; border: 1px solid #e3bfb0; border-radius: 4px; font: 11px var(--mono); }
+.diagnostic .diagnostic-message { margin: 13px 0; line-height: 1.8; overflow-wrap: anywhere; }
+.diagnostic-fix { padding: 12px; border: 1px solid #e9cfc1; border-radius: 4px; background: #fffaf5; }
+.diagnostic-fix>strong { font-size: 11px; }
+.diagnostic .diagnostic-fix p { margin: 5px 0 0; line-height: 1.8; overflow-wrap: anywhere; }
+.diagnostic-actions button { white-space: normal; text-align: left; }
+@media (max-width: 560px) { .diagnostic { padding: 13px; margin: 13px; }.diagnostic-actions { align-items: stretch; }.diagnostic-actions button { flex: 1 1 130px; } }

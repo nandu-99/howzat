@@ -70,3 +70,16 @@ terminal, and empty-production colors. Token transitions use light surfaces,
 readable labels, directed arrows, and a double-ring accepting state. Each syntax
 view has unique tab and delivery IDs so the guide and playground cannot redirect
 keyboard focus into one another.
+
+## Semantic results and diagnostics
+
+Semantic results start with a checked-rules summary and counts of teams, overs,
+and deliveries. The existing tables retain every validated value and original
+source position. Light headers, row hover states, and source-link controls match
+the application palette; wide tables scroll within their panels.
+
+Compiler diagnostics separate the failed phase, source location, message,
+suggested correction, and recovery actions. Line numbers appear only when an
+original source location is available. Runtime errors do not suggest that a
+generated Python line is an original Howzat line. Error content is rendered as
+text, and the existing editor selection and corrected-example actions are kept.
