@@ -1,3 +1,4 @@
+import { CodeEditor } from './CodeEditor';
 import { StrictMode, useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { CodeIcon, PlayIcon, ReaderIcon, ReloadIcon, FileTextIcon } from '@radix-ui/react-icons';
@@ -116,10 +117,9 @@ export function App() {
             {chosen && <><p>{chosen.description}</p><p className="expected"><strong>Expected:</strong> {chosen.expected}</p></>}
           </div>
           <div className="editor-file"><span><i aria-hidden="true"/>match.howzat</span><span>UTF-8</span></div>
-          <label className="sr-only" htmlFor="source">Howzat source code</label>
-          <textarea className="source-textarea" id="source" ref={editor} value={source} spellCheck={false} maxLength={50000} placeholder="Enter Howzat code here…" onChange={event => {
-            sourceTouched.current = true; stop(); setSource(event.target.value); setPhases(emptyPhases()); setScore(null); setRequestError('');
-          }} onKeyDown={event => { if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') { event.preventDefault(); void compile(); } }}/>
+          <CodeEditor source={source} inputRef={editor} onChange={value => {
+            sourceTouched.current = true; stop(); setSource(value); setPhases(emptyPhases()); setScore(null); setRequestError('');
+          }} onCompile={() => void compile()}/>
           <div className="compile-row"><span>Ctrl / ⌘ + Enter</span>{busy && <button onClick={cancel}>Cancel</button>}<button className="primary" disabled={busy || !health || !source.trim()} onClick={() => void compile()}>{busy ? <ReloadIcon className="spin" aria-hidden="true"/> : <PlayIcon aria-hidden="true"/>}{busy ? 'Compiling…' : 'Compile'}</button></div>
         </section>
         <Scorecard data={score}/>

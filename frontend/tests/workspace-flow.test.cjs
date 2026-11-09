@@ -77,9 +77,11 @@ test('all eight examples, error selection, corrections, match results, and navig
     assert.equal(app.host.querySelector('#example').tagName,'SELECT');
     assert.equal(app.host.querySelector('.brand-mark').getAttribute('src'),'/assets/howzat-mark-128.png');
     assert.equal(app.host.querySelectorAll('.workflow li').length,3);
-    assert.ok(app.host.querySelector('#source').classList.contains('source-textarea'));
+    assert.ok(app.host.querySelector('.code-editor #source'));
     for (const example of fixture.examples) {
       await select(app.host,example.id);
+      assert.equal(app.host.querySelector('.editor-highlight pre').textContent, example.source + '\n');
+      assert.equal(app.host.querySelectorAll('.editor-gutter span').length, example.source.split('\n').length);
       await click(app.host.querySelector('.primary'));
       if (example.failure_phase !== undefined) {
         const diagnostic=app.host.querySelector('.error');assert.ok(diagnostic);
@@ -107,6 +109,22 @@ test('all eight examples, error selection, corrections, match results, and navig
     await click(app.host.querySelector('a[href="/language"]'));
     assert.equal(window.location.pathname,'/language');
     assert.ok(app.host.querySelector('#tokens'));
+    const sidebar = app.host.querySelector('.guide-sidebar');
+    assert.equal(sidebar.querySelectorAll('nav a').length, 7);
+    for (const id of ['introduction','syntax','tokens','rules','grammar','examples','pipeline']) assert.ok(app.host.querySelector('#'+id));
+    assert.equal(app.host.querySelectorAll('.pipeline-explainer li').length,6);
+    await click(sidebar.querySelector('a[href="/language#grammar"]'));
+    assert.equal(window.location.hash,'#grammar');
+    assert.equal(sidebar.querySelector('[aria-current="location"]').textContent,'04Context-free grammar');
+    const exampleTabs=app.host.querySelectorAll('.guide-example-tabs button');
+    assert.equal(exampleTabs.length,3);
+    await click(exampleTabs[1]);
+    assert.ok(app.host.querySelector('#guide-example-panel').textContent.includes('Includes 5 extras'));
+    assert.equal(exampleTabs[1].getAttribute('aria-selected'),'true');
+    await act(async()=>exampleTabs[1].dispatchEvent(new window.KeyboardEvent('keydown',{key:'ArrowRight',bubbles:true,cancelable:true})));
+    assert.equal(exampleTabs[2].getAttribute('aria-selected'),'true');
+    assert.equal(document.activeElement,exampleTabs[2]);
+
     await click(app.host.querySelector('.app-navigation a[href="/"]'));
     assert.equal(app.host.querySelector('#source').value,source);
     assert.ok(app.host.querySelector('.match-result').textContent.includes('India won by 3 runs'));
@@ -135,4 +153,25 @@ test('cancelled requests cannot restore stale scorecards',async()=>{
     await click(app.host.querySelector('.primary'));
     assert.ok(app.host.querySelector('.score-row').textContent.includes('16/0'));
   } finally {hold=false;await app.close();}
+});
+
+ test('editor scrolling stays aligned and guide examples load into the playground', async()=>{
+  offline=false;hold=false;const app=await mount();
+  try {
+    const editor=app.host.querySelector('#source');
+    await act(async()=>{
+      editor.scrollTop=48;editor.scrollLeft=30;
+      editor.dispatchEvent(new window.Event('scroll',{bubbles:true}));
+    });
+    assert.equal(app.host.querySelector('.editor-highlight pre').style.transform,'translate(-30px, -48px)');
+    assert.equal(app.host.querySelector('.editor-gutter>div').style.transform,'translateY(-48px)');
+    await click(app.host.querySelector('a[href="/language"]'));
+    const tabs=app.host.querySelectorAll('.guide-example-tabs button');
+    await click(tabs[1]);
+    await click(app.host.querySelector('#guide-example-panel .guide-cta'));
+    assert.equal(window.location.pathname,'/');
+    assert.equal(app.host.querySelector('#source').value,fixture.reference.samples[1].source);
+    assert.equal(app.host.querySelector('.editor-highlight pre').textContent,fixture.reference.samples[1].source+'\n');
+    assert.equal(app.host.querySelector('.phase-total').textContent,'0/6');
+  } finally {await app.close();}
 });
