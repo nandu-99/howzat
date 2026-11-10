@@ -1,9 +1,8 @@
 /* Shared surface colors keep existing views readable under the application theme. */
-.token-output th, .semantic-output th, .optimization-comparison h3, .code-label { background: var(--surface); color: var(--text); }
+.token-output th, .semantic-output th, .code-label { background: var(--surface); color: var(--text); }
 .token-output code, .semantic-output code, .language-guide code { font-family: var(--mono); }
 .token-string { color: #80571c; }.token-number { color: #355f79; }.token-identifier { color: var(--text); }
-.code-output pre, .optimization-output pre, .language-guide pre { background: var(--code-bg); color: var(--text); }
-.optimization-removed { background: #f8e9e2; color: #993e32; }.optimization-added { background: #e9f0dc; color: #31572c; }
+.language-guide pre { background: var(--code-bg); color: var(--text); }
 .language-guide>nav { background: var(--bg); }
 .language-guide select { color: var(--text); background: var(--panel); }
 .keyword-list code { color: var(--accent); background: var(--accent-soft); }
