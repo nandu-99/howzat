@@ -1,2 +1,0 @@
-# Keep backend dependency versions in one place.
--r backend/requirements.txt
