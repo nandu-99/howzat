@@ -1,0 +1,9 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://howzat-f1nj.onrender.com/api/:path*"
+    },
+    { "source": "/language", "destination": "/index.html" }
+  ]
+}
