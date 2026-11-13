@@ -11,6 +11,15 @@ tree (AST), semantic checks, intermediate instructions, optimized instructions,
 and generated Python. The generated program runs on the backend to produce the
 scorecard; it is not a hardcoded preview.
 
+## Live demo
+
+- [Open the playground](https://howzat-nine.vercel.app/)
+- [Read the language guide](https://howzat-nine.vercel.app/language)
+- [Check backend health](https://howzat-f1nj.onrender.com/api/health)
+
+The frontend is hosted on Vercel and the backend on Render. Vercel forwards
+`/api/*` requests to the backend. No database is required.
+
 ## Run locally
 
 ### Requirements
