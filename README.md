@@ -1,46 +1,63 @@
-# Howzat - Cricket Scoring Compiler
+# Howzat — Cricket Scoring Compiler
 
-Howzat is a compiler-design project that turns cricket scoring instructions into
-an executable Python program and a scorecard. Its small domain-specific language
-(DSL) describes teams, innings, overs, and deliveries. The web interface shows
-what happens at each of the six compiler phases, making the project useful for
-learning and demonstrating compiler concepts.
+Howzat turns cricket scoring instructions into an executable Python program and
+a scorecard. Its small domain-specific language (DSL) describes teams, innings,
+overs, and deliveries. The website shows the actual output of all six compiler
+phases, so users can follow how source code becomes a result.
 
-The outputs come from the actual compiler: tokens, parse trees, an abstract syntax
-tree (AST), semantic checks, intermediate instructions, optimized instructions,
-and generated Python. The generated program runs on the backend to produce the
-scorecard; it is not a hardcoded preview.
+## Demo and report
 
-## Live demo
+- [Live playground](https://howzat-nine.vercel.app/)
+- [Language guide](https://howzat-nine.vercel.app/language)
+- [Backend health](https://howzat-f1nj.onrender.com/api/health)
+- **[IEEE project report (PDF)](report/howzat-ieee-report.pdf)**
 
-- [Open the playground](https://howzat-nine.vercel.app/)
-- [Read the language guide](https://howzat-nine.vercel.app/language)
-- [Check backend health](https://howzat-f1nj.onrender.com/api/health)
+## Features
 
-The frontend is hosted on Vercel and the backend on Render. Vercel forwards
-`/api/*` requests to the backend. No database is required.
+- Source editor with syntax highlighting, line numbers, and custom example menus.
+- Tokens with original source positions, interactive AST and parse trees, and
+  selected-delivery grammar rules, derivations, and token transitions.
+- Symbol table and checks for team references, run values, overs, wickets, and chases.
+- Intermediate instructions, constant folding and propagation, and a before/after comparison.
+- Generated Python that executes to produce scores, extras, run rates, delivery
+  history, targets, and match results.
+- Clear lexical, syntax, and semantic errors with source selection and corrected examples.
+- Five correct examples and three error examples, plus an interactive language guide.
+- Responsive layout, keyboard controls, request cancellation, and connection retry.
 
-## Run locally
+No database, login, API key, or `.env` file is required. Source text is saved in
+browser session storage. Results stay available during route navigation but are
+not restored after a page refresh.
 
-### Requirements
+## Requirements and dependencies
 
-- Python 3.10 or newer, with `pip` and `venv`.
-- Node.js 20.19+ or 22.12+, with npm.
-- An internet connection for the initial dependency installation. No database,
-  API keys, or `.env` configuration is required.
+Install **Git**, **Python 3.10+** with `pip`/`venv`, and **Node.js 20.19+ or 22.12+**
+with npm. An internet connection is needed for the first dependency installation.
 
-Clone the repository and enter its folder (Git must be installed):
+| Area | Dependencies | Dependency file |
+|---|---|---|
+| Backend | FastAPI, Uvicorn, HTTPX for API tests | `backend/requirements.txt` |
+| Frontend | React, TypeScript, Vite, React Router | `frontend/package.json` |
+| UI and diagrams | Radix Select/icons, react-d3-tree, React Flow, Fontsource fonts | `frontend/package.json` |
+| Tests | Python unittest, Node test runner, jsdom | Backend requirements and frontend package files |
+
+The Python standard library supplies the compiler logic and generated scoring
+runtime. `frontend/package-lock.json` records the resolved frontend dependencies;
+use `npm ci` to install them.
+
+## Quick start
+
+Clone the repository and enter its root folder:
 
 ```bash
 git clone https://github.com/nandu-99/howzat.git
 cd howzat
 ```
 
-Run all setup commands below **inside this `howzat` repository**, where `dev.py`,
-`backend/`, and `frontend/` are located. If you already cloned it, enter that
-existing folder instead.
+If already cloned, enter the existing folder. Run all commands below from the
+folder containing `dev.py`, `backend/`, and `frontend/`.
 
-### First-time setup — macOS / Linux
+### macOS / Linux
 
 ```bash
 python3 -m venv .venv
@@ -51,7 +68,7 @@ python3 dev.py --check
 python3 dev.py
 ```
 
-### First-time setup — Windows PowerShell
+### Windows PowerShell
 
 ```powershell
 py -m venv .venv
@@ -61,24 +78,20 @@ py dev.py --check
 py dev.py
 ```
 
-The launcher uses the repository's `.venv` and starts both servers. It checks
-that ports 8000 and 5173 are available. Stop it with **Ctrl+C**.
+The launcher starts both servers and checks that ports 8000 and 5173 are free.
+Stop both with **Ctrl+C**. After setup, run `python3 dev.py` again on macOS/Linux
+or `py dev.py` on Windows; dependency installation is not needed for every run.
 
-| Page | Local address |
+| Page | Local URL |
 |---|---|
 | Playground | http://127.0.0.1:5173/ |
 | Language guide | http://127.0.0.1:5173/language |
-| Interactive API documentation | http://127.0.0.1:8000/docs |
-| Backend health and available phases | http://127.0.0.1:8000/api/health |
+| API documentation | http://127.0.0.1:8000/docs |
+| Backend health | http://127.0.0.1:8000/api/health |
 
-For later runs, use `python3 dev.py` on macOS/Linux or `py dev.py` on Windows.
-Source changes reload automatically.
+### Run the servers separately
 
-### Run backend and frontend separately
-
-Use two terminals, both starting in the repository root. The following backend
-command is for macOS/Linux; on Windows, replace `.venv/bin/python` with
-`.\.venv\Scripts\python.exe`.
+Use two terminals, both starting in the repository root.
 
 **Terminal 1 — backend:**
 
@@ -92,137 +105,88 @@ command is for macOS/Linux; on Windows, replace `.venv/bin/python` with
 npm --prefix frontend run dev
 ```
 
-Open port **5173** during development. Vite forwards `/api` requests to the backend
-on port 8000. The frontend needs the backend to compile and load reference data.
+On Windows, replace `.venv/bin/python` with `.\.venv\Scripts\python.exe`.
+Open port **5173** during development. The frontend needs the backend to compile
+programs and load examples and language-reference data.
 
-## Evaluator walkthrough
+## Try the compiler
 
-1. Open the playground and keep **Start here: one over** selected.
-2. Click **Compile**, or press **Ctrl+Enter / Cmd+Enter** in the editor.
-3. Check that all six phases pass and the scorecard shows **13/0 in 1.0 overs**.
-4. Select each phase to inspect tokens, trees, rule checks, instructions,
-   optimization, and generated Python. Token values and semantic source buttons
-   locate the original code in the editor.
-5. Choose **See code simplification** to demonstrate constant folding and compare
-   the instructions before and after optimization.
-6. Choose **Score a completed match** to see India win by **3 runs**.
-7. Try an error example. Inspect the failed phase, click **Show in editor**, then
-   **Load corrected code** and compile again. Later phases are skipped after a
-   failure, and no successful scorecard is shown.
-8. Open **Language guide** for the token regex, keyword definitions, cricket rules,
-   grammar, example trees, and derivations. **Try in playground** loads an example
-   without compiling it automatically.
+1. Select **Start here: one over** and click **Compile** or press **Ctrl/Cmd+Enter**.
+2. Confirm that all six phases pass and the scorecard shows **13/0 in 1.0 overs**.
+3. Select each phase to inspect its output. Click token values or semantic source
+   buttons to locate the original code.
+4. Try **See code simplification** to inspect constant optimization.
+5. Try **Score a completed match** to see India win by **3 runs**.
+6. Compile an error example, use **Show in editor**, then **Load corrected code**
+   and compile again.
 
-The editor has syntax highlighting and line numbers. Navigation between the
-playground and guide preserves the current source and compiler results. Editor
-text is also saved for the current browser session. A running compilation can be
-cancelled; stale responses cannot overwrite newer source or results.
+| Built-in example | Expected outcome |
+|---|---|
+| Start here: one over | 13/0 in 1.0 overs; innings in progress |
+| Add wides and no-balls | 16/0 in 1.0 overs; 5 extras |
+| Take wickets and stop early | 13/3 in 1.2 overs; innings in progress |
+| See code simplification | 14/0 in 1.0 overs; three temporary assignments removed |
+| Score a completed match | India 21/1, Australia 18/1; India win by 3 runs |
+| Find an unknown character | Lexical analysis fails |
+| Find a missing comma | Syntax analysis fails |
+| Try to take 11 wickets | Semantic analysis rejects the eleventh wicket |
 
-### Included examples
-
-The example menu contains exactly **five correct programs and three errors**.
-
-| Example | What to demonstrate | Expected result |
-|---|---|---|
-| Start here: one over | Basic compilation | 13/0 in 1.0 overs; innings in progress |
-| Add wides and no-balls | Extras and legal-ball counting | 16/0 in 1.0 overs, including 5 extras |
-| Take wickets and stop early | Wickets and a partial over | 13/3 in 1.2 overs; innings in progress |
-| See code simplification | Constant folding and propagation | 14/0; three temporary assignments removed |
-| Score a completed match | Two innings and a match result | India 21/1, Australia 18/1; India win by 3 runs |
-| Find an unknown character | Lexical error | Phase 1 fails |
-| Find a missing comma | Syntax error | Phase 2 fails |
-| Try to take 11 wickets | Semantic error | Phase 3 rejects the eleventh wicket |
-
-Overs use cricket notation: **1.2 means one over and two legal balls**, not a
-decimal fraction.
-
-## A small Howzat program
+## Language example
 
 ```text
 team IND "India";
 team AUS "Australia";
 
-// India scores 13 runs in six legal balls.
 innings IND {
   over 1 { 0, 1, 4, 0, 2, 6 }
 }
 ```
 
-Declare exactly two teams, even when recording only one innings. Team declarations
-end with semicolons, braces group innings and overs, and commas separate
-deliveries. Keywords are lowercase and case-sensitive.
+Declare exactly two teams, even when recording one innings. Semicolons end team
+declarations, braces group blocks, and commas separate deliveries. Keywords are
+lowercase and case-sensitive.
 
-| Write | Meaning |
-|---|---|
-| `0` through `6` | Bat runs; `0` is a dot ball |
-| `wicket` | One wicket, using a legal ball |
-| `wide`, `noball` | One extra run each; neither uses a legal ball |
-| `run(2 + 2)` | Bat runs calculated from an integer expression |
-| `bye(2)`, `legbye(1)` | Byes or leg-byes, using a legal ball |
-| `over 2 partial { ... }` | An unfinished final over with fewer than six legal balls |
-| `innings IND complete { ... }` | Explicitly mark an innings as finished |
+- `0`–`6`: bat runs. `run(2 + 2)` also records bat runs using an expression.
+- `wicket`: one wicket, zero runs, and one legal ball.
+- `wide` / `noball`: one extra run each, without using a legal ball.
+- `bye(2)` / `legbye(1)`: extras using a legal ball; values must be 1–4.
+- `over 2 partial { ... }`: an unfinished final over with fewer than six legal balls.
+- `innings IND complete { ... }`: explicitly finish an innings.
 
-Expressions support addition, multiplication, and parentheses. Bat runs must be
-0-6; byes and leg-byes must be 1-4. Overs start at 1 and progress sequentially.
-A full over contains exactly six legal balls; nothing may follow wicket ten.
+Expressions support `+`, `*`, and parentheses. A full over has six legal balls.
+**1.2 overs means one over and two balls**, not a decimal fraction. Closing an
+innings block does not itself finish the innings. Explicit completion, all-out,
+or reaching a confirmed target determines completion and the match result.
 
-Closing an innings brace does not by itself finish that innings. A finished first
-innings establishes a chase target. A result is shown when enough information is
-available; two declared teams or an unfinished snapshot alone do not establish a
-winner. All-out and confirmed target completion also finish an innings.
+The model supports one innings per team. It does not model individual players,
+combined no-ball/bat-run outcomes, rain-adjusted targets, or super overs.
 
-This is a focused scoring language, not a full cricket simulation: it does not
-model individual batters, bowlers, fielding, or combined outcomes such as a no-ball
-hit for four. A wide or no-ball is a standalone one-run event in this model.
-
-## How the compiler works
-
-| Phase | Concept | Output shown in the UI |
-|---|---|---|
-| 1. Lexical analysis | Match characters to token patterns | Keywords, identifiers, numbers, strings, symbols, and source positions |
-| 2. Syntax analysis | Parse the context-free grammar | AST, parse tree, selected-delivery CFG productions, and token transitions |
-| 3. Semantic analysis | Resolve symbols and validate meaning | Team symbol table, delivery values, over rules, and innings checks |
-| 4. Intermediate code | Translate the AST into scoring instructions | Ordered instructions with temporary expression values |
-| 5. Code optimization | Fold constants and propagate temporary values | Before/after instructions, changes, and instruction counts |
-| 6. Target code generation | Generate and execute Python | Python source, validated scoring data, and scorecard |
-
-Optimization simplifies calculations such as `run(2 + 2)`. Plain numeric deliveries
-may have nothing to simplify; that is a valid outcome. Optimization preserves
-delivery order and scores.
-
-The guide contains the language's context-free grammar (CFG). The separate token
-transition diagram follows the tokens of one selected delivery from an initial
-state to a final state; it is not a diagram of the entire language grammar.
-
-The backend streams phase events as newline-delimited JSON. It stops at the first
-failure. Generated Python runs in a separate process with a five-second time
-limit, and its scoring output is validated before reaching the UI.
-
-## Project structure
+## Compiler workflow
 
 ```text
-howzat/
-├── backend/
-│   ├── main.py              # FastAPI routes and streamed compilation
-│   ├── language.py          # Token definitions, examples, language reference
-│   ├── compiler/            # Lexer, parser, semantics, IR, optimizer, Python target
-│   └── tests/               # Compiler and API tests
-├── frontend/
-│   ├── src/                 # React editor, guide, phase views, diagrams, scorecard
-│   ├── public/assets/       # Logo and stadium imagery
-│   └── tests/               # Component, transformation, and application flow tests
-├── docs/                    # Language and compiler documentation
-└── dev.py                   # Local backend + frontend launcher
+Source → Tokens → AST / Parse tree → Semantic checks
+       → Intermediate code → Optimized code → Python → Scorecard
 ```
 
-The frontend uses React, TypeScript, and Vite; Radix Select provides custom menus,
-react-d3-tree renders trees, and React Flow renders token transitions. The backend
-uses Python, FastAPI, and Uvicorn. The compiler phases are implemented in Python.
+| Phase | Output |
+|---|---|
+| 1. Lexical analysis | Token types, original text, and source positions |
+| 2. Syntax analysis | AST, concrete parse tree, selected-delivery CFG rules and token trace |
+| 3. Semantic analysis | Symbol table, expression values, over/innings and delivery checks |
+| 4. Intermediate code | Ordered scoring instructions and arithmetic temporaries |
+| 5. Code optimization | Constant folding/propagation, changes, and instruction counts |
+| 6. Target code generation | Generated Python and validated execution results |
 
-## Tests and build
+The parser uses recursive descent. CFG means **context-free grammar**; the token
+transition diagram traces one delivery and is not an automaton for the full grammar.
+The backend streams phase events as newline-delimited JSON and stops at the first
+failure. Later phases are skipped. Generated Python runs with a five-second
+execution timeout. Plain numeric deliveries may need no optimization.
 
-Install both Python and frontend dependencies first: frontend flow tests use
-actual compiler events produced by Python. From the repository root:
+## Tests and production build
+
+Install both Python and frontend dependencies first. Frontend flow tests use
+actual compiler events produced by Python.
 
 ```bash
 .venv/bin/python -m unittest discover -s backend/tests -v
@@ -230,48 +194,82 @@ npm --prefix frontend test
 npm --prefix frontend run build
 ```
 
-On Windows, use `.\.venv\Scripts\python.exe` in place of `.venv/bin/python`.
+On Windows, use `.\.venv\Scripts\python.exe` instead of `.venv/bin/python`.
+Verified on **25 November 2026**: **114 backend tests**, **45 frontend tests**, and
+the TypeScript/production build passed. Tests cover compiler correctness, scoring,
+optimization, source links, corrections, navigation, keyboard controls, and cancellation.
+DOM flow tests substitute canvas renderers; tree appearance and interactions also
+need browser checks. The build reports a non-blocking JavaScript chunk-size warning.
 
-Verified on **10 November 2026**: **114 backend tests**, **45 frontend tests**, and
-the TypeScript/production build passed. Coverage includes grammar, rule errors,
-optimization, scoring, source selection, corrected examples, dropdown keyboard
-controls, guide navigation, cancellation, and offline recovery.
-
-DOM flow tests substitute tree/graph canvas renderers; they do not replace visual
-browser checks of diagram rendering and responsive layouts. The build currently
-reports a non-blocking JavaScript chunk-size warning.
-
-### Serve the built app locally
-
-After `npm --prefix frontend run build`, stop and restart the backend:
+The build creates `frontend/dist`. To serve the built app and API together, stop
+any existing backend and start it **after building**:
 
 ```bash
 .venv/bin/python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000
 ```
 
-Open http://127.0.0.1:8000/ or http://127.0.0.1:8000/language. The backend mounts
-`frontend/dist` at startup, so build before starting it. A separate Vite server is
-not needed in this mode.
+Open http://127.0.0.1:8000/ or http://127.0.0.1:8000/language. A separate frontend
+server is not needed in this mode.
+
+## Project files and deployment
+
+```text
+howzat/
+├── backend/                 # API, all compiler phases, runtime, results, tests
+│   └── requirements.txt     # Python dependencies
+├── frontend/
+│   ├── src/                 # Editor, guide, phase views, scorecard, shared styles
+│   ├── public/assets/       # Logo, favicon, and stadium image
+│   ├── package.json         # Frontend dependencies and commands
+│   ├── package-lock.json    # Resolved dependency versions
+│   ├── vite.config.ts       # Local API proxy
+│   └── vercel.json          # Deployed API and guide routing
+├── docs/                    # Language and compiler specifications
+├── report/
+│   └── howzat-ieee-report.pdf
+└── dev.py                   # Starts both local development servers
+```
+
+Source files, configuration, dependency manifests, and required image assets are
+included. Fonts are installed through npm and bundled by Vite. `.venv`,
+`node_modules`, and `dist` are generated locally and intentionally ignored;
+install dependencies and build them using the commands above.
+
+The deployed frontend uses Vercel with Root Directory `frontend`, build command
+`npm run build`, and output directory `dist`. Its `/api/*` rewrite forwards requests
+to the Render backend; `/language` serves the React entry page. The local Vite
+proxy instead forwards `/api` to port 8000. No `VITE_API_URL` is needed for this setup.
+
+The Render backend uses the repository root, build command
+`pip install -r backend/requirements.txt`, and start command:
+
+```bash
+uvicorn backend.main:app --host 0.0.0.0 --port $PORT
+```
+
+If using another backend address, update the API destination in
+`frontend/vercel.json`. `dev.py` is for local development, not production hosting.
 
 ## Troubleshooting
 
-| Symptom | What to do |
+| Problem | Fix |
 |---|---|
-| `Address already in use` / launcher reports an occupied port | Stop the earlier server with Ctrl+C in its terminal. On macOS/Linux, `lsof -nP -iTCP:8000 -sTCP:LISTEN` or the same command with `5173` identifies the listener. |
-| `No module named backend` | Run the backend command from the repository root, not inside `backend/`. |
-| `No module named fastapi` | Install requirements using this repository's `.venv` Python, then run `python3 dev.py --check`. |
-| Frontend dependencies are missing | Run `npm --prefix frontend ci` from the repository root. |
-| Backend disconnected / compilation disabled | Check the backend terminal and `/api/health`; start port 8000, then use the UI retry control. |
-| `/language` or `/` is missing on port 8000 | Build the frontend, then restart the backend; use port 5173 for development. |
-| Frontend tests cannot locate Python | Create `.venv` in the repository root and install the backend requirements. |
+| Port 8000 or 5173 is already in use | Stop the earlier server with Ctrl+C, then restart. |
+| `No module named backend` | Run commands from the repository root using `backend.main:app`. |
+| Python dependencies are missing | Install `backend/requirements.txt` using the repository's `.venv` Python. |
+| Frontend dependencies are missing | Run `npm --prefix frontend ci`. |
+| Backend disconnected | Check the backend terminal or health URL, then retry the UI connection. |
+| `/language` is missing on port 8000 | Build the frontend and restart the backend; use port 5173 during development. |
+| Frontend flow tests cannot locate Python | Create `.venv` in the repository root and install backend dependencies. |
 
-## Further reading
+## Documentation
 
-- [Language and lexical rules](docs/LANGUAGE.md)
-- [Grammar and AST contract](docs/GRAMMAR.md)
-- [Semantic analysis and cricket rules](docs/SEMANTICS.md)
-- [Intermediate instructions and Python generation](docs/TRANSLATION.md)
-- [Constant optimization](docs/OPTIMIZATION.md)
-- [Syntax visualizations](docs/SYNTAX-VIEWS.md)
-- [Compiler module contracts](docs/CONTRACTS.md)
+- [IEEE project report (PDF)](report/howzat-ieee-report.pdf)
+- [Language and token definitions](docs/LANGUAGE.md)
+- [Grammar and AST](docs/GRAMMAR.md)
+- [Semantic and cricket rules](docs/SEMANTICS.md)
+- [Intermediate code and Python generation](docs/TRANSLATION.md)
+- [Optimization](docs/OPTIMIZATION.md)
+- [Syntax views](docs/SYNTAX-VIEWS.md)
+- [Compiler interfaces](docs/CONTRACTS.md)
 - [Design and typography](docs/DESIGN.md)
